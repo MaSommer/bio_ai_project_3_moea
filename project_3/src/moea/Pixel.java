@@ -32,11 +32,11 @@ public class Pixel {
 		return neighbours;
 	}
 	
-	public void addPixel(Pixel p){
+	public void addNeighbour(Pixel p){
 		neighbours.add(p);
 	}
 	
-	public void removePixel(Pixel p){
+	public void removeNeighbour(Pixel p){
 		neighbours.remove(p);
 	}
 
