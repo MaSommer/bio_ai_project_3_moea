@@ -60,6 +60,19 @@ public class HelpMethods {
 		return createPixelNeighbours(result);
 	}
 	
+	public static ArrayList<Pixel> generatePixelList(Pixel[][] pixels){
+		int height = pixels.length;
+		int width = pixels[0].length;
+		ArrayList<Pixel> pixelList = new ArrayList<Pixel>();
+		for (int i = 0; i < height; i++) {
+			for (int j = 0; j < width; j++) {
+				pixelList.add(pixels[i][j]);
+				System.out.println("id:" + pixels[i][j].getId());
+			}
+		}
+		return pixelList;
+	}
+	
 	public static Pixel[][] createPixelNeighbours(Pixel[][] pixels){
 		int height = pixels.length;
 		int width = pixels[0].length;
@@ -86,8 +99,19 @@ public class HelpMethods {
 		}
 		return pixels;
 	}
+	
+	public static ArrayList<ArrayList<Pixel>> generateImage(Pixel[][] pixels){
+		ArrayList<ArrayList<Pixel>> image = new ArrayList<ArrayList<Pixel>>();
+		for(int i = 0 ; i < pixels.length ; i++){
+			image.add(new ArrayList<Pixel>());
+			for(int j = 0 ; j < pixels[0].length ; j++){
+				image.get(i).add(pixels[i][j]);
+			}
+		}
+		return image;
+	}
 
-	public static void drawImage(Pixel[][] pixels){
+	public static void drawImage(ArrayList<ArrayList<Pixel>> pixels){
 		JFrame frame = new DrawImage(pixels);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.pack();

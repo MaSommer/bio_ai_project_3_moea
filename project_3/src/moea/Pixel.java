@@ -13,8 +13,6 @@ public class Pixel {
 
 	private ArrayList<Pixel> neighbours;
 
-
-
 	private ArrayList<Double> neighbourDistances;
 	
 	//{west, north, east, south}
