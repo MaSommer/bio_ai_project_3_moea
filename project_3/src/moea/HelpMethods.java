@@ -10,7 +10,7 @@ public class HelpMethods {
 	
 	
 	public static Pixel[][] createImagePixelByPixel(String imagePath) throws IOException{
-		BufferedImage image = ImageIO.read(ReadPicture.class.getResource(imagePath));
+		BufferedImage image = ImageIO.read(HelpMethods.class.getResource(imagePath));
 		final byte[] pixels = ((DataBufferByte) image.getRaster().getDataBuffer()).getData();
 		final int width = image.getWidth();
 		final int height = image.getHeight();
