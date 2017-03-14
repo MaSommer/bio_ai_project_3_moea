@@ -10,9 +10,14 @@ public class Pixel {
 	private int alpha;
 	private int id;
 	private boolean hasAlphaChannel;
+
+	private ArrayList<Pixel> neighbours;
+
+
+
+	private ArrayList<Double> neighbourDistances;
 	
 	//{west, north, east, south}
-	private Pixel[] neighbours;
 	
 	public Pixel(int red, int green, int blue, int alpha, boolean hasAlphaChannel, int id){
 		this.red = red;
@@ -21,13 +26,20 @@ public class Pixel {
 		this.alpha = alpha;
 		this.id = id;
 		this.hasAlphaChannel = hasAlphaChannel;
-		neighbours = new Pixel[4];
+		neighbours = new ArrayList<Pixel>();
+		neighbourDistances = new ArrayList<Double>();
+		for(Pixel neighbour: neighbours){
+			neighbourDistances.add(Functions.pixelToPixelDeviation(this, neighbour));
+		}
 	}
 	
 	public int getRed() {
 		return red;
 	}
 	
+	public ArrayList<Pixel> getNeighbours() {
+		return neighbours;
+	}
 	public int getId(){
 		return id;
 	}
@@ -48,16 +60,20 @@ public class Pixel {
 		return blue;
 	}
 
-	public Pixel[] getNeighbours() {
-		return neighbours;
+	
+	public void addNeighbour(Pixel p){
+		neighbours.add(p);
 	}
 	
-//	public void addNeighbour(Pixel p){
-//		neighbours.add(p);
-//	}
-//	
-//	public void removeNeighbour(Pixel p){
-//		neighbours.remove(p);
-//	}
+	public void removeNeighbour(Pixel p){
+		neighbours.remove(p);
+	}
+	
+
+	
+	public double getDistance(Pixel neighbour){
+		int index = neighbours.indexOf(neighbour);
+		return neighbourDistances.get(index);
+	}
 
 }

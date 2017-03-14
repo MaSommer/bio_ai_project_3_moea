@@ -3,6 +3,7 @@ package moea;
 import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferByte;
 import java.io.IOException;
+import java.util.ArrayList;
 
 import javax.imageio.ImageIO;
 import javax.swing.JFrame;
@@ -64,36 +65,23 @@ public class HelpMethods {
 		int width = pixels[0].length;
 		for (int i = 0; i < height; i++) {
 			for (int j = 0; j < width; j++) {
-				Pixel[] neighbours = pixels[i][j].getNeighbours();
+				ArrayList<Pixel> neighbours = pixels[i][j].getNeighbours();
 				//insert west neighbour
-				if (j == 0){
-					neighbours[0] = null;
-				}
-				else{
-					neighbours[0] = pixels[i][j-1];
+				if (j != 0){
+					neighbours.add(pixels[i][j-1]);
 				}
 				//insert north neighbour
-				if (i == 0){
-					neighbours[1] = null;
-				}
-				else{
-					neighbours[1] = pixels[i-1][j];
+				if (i != 0){
+					neighbours.add(pixels[i-1][j]);
 				}
 				//insert east neighbour
-				if (j == width-1){
-					neighbours[2] = null;
-				}
-				else{
-					neighbours[2] = pixels[i][j+1];
+				if (j != width-1){
+					neighbours.add(pixels[i][j+1]);
 				}
 				//insert south neighbour
-				if (i == height-1){
-					neighbours[1] = null;
+				if (i != height-1){
+					neighbours.add(pixels[i+1][j]);
 				}
-				else{
-					neighbours[1] = pixels[i+1][j];
-				}
-				
 			}
 		}
 		return pixels;
