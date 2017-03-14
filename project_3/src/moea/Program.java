@@ -5,10 +5,9 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 public class Program {
-	
+	private ArrayList<Pixel> pixels;
 	private ArrayList<ArrayList<Pixel>> population;
 	private ArrayList<ArrayList<Pixel>> image;
-	private HashMap<Double,Double> pixelDistances;
 	private int maxSegments;
 	private int minPixelsInSegment;
 	private double mRate;
@@ -26,13 +25,11 @@ public class Program {
 		this.pSize = pSize;
 		this.population = new ArrayList<ArrayList<Pixel>>();
 		this.image = new ArrayList<ArrayList<Pixel>>();
-		this.pixelDistances = new HashMap<Double,Double>();
+		this.pixels = new ArrayList<Pixel>();
 	}
 
 
-
 	public void init(){
-		
 		
 	}
 	
