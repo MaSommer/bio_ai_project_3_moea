@@ -10,6 +10,7 @@ public class Pixel {
 	private int alpha;
 	private boolean hasAlphaChannel;
 	private ArrayList<Pixel> neighbours;
+	private ArrayList<Double> neighbourDistances;
 	
 	public Pixel(int red, int green, int blue, int alpha, boolean hasAlphaChannel){
 		this.red = red;
@@ -18,6 +19,10 @@ public class Pixel {
 		this.alpha = alpha;
 		this.hasAlphaChannel = hasAlphaChannel;
 		neighbours = new ArrayList<Pixel>();
+		neighbourDistances = new ArrayList<Double>();
+		for(Pixel neighbour: neighbours){
+			neighbourDistances.add(Functions.pixelToPixelDeviation(this, neighbour));
+		}
 	}
 	
 	public int getRed() {
@@ -50,6 +55,11 @@ public class Pixel {
 	
 	public void removeNeighbour(Pixel p){
 		neighbours.remove(p);
+	}
+	
+	public double getDistance(Pixel neighbour){
+		int index = neighbours.indexOf(neighbour);
+		return neighbourDistances.get(index);
 	}
 
 }

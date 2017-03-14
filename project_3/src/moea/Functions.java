@@ -15,7 +15,7 @@ public class Functions {
 		return Math.pow(notSquaredDev, 0.5);
 	}
 	
-	public double pixelToPixelDeviation(Pixel p1, Pixel p2){
+	public static double pixelToPixelDeviation(Pixel p1, Pixel p2){
 		double redDistance =p1.getRed()-p2.getRed();
 		double greenDistance = p1.getGreen() - p2.getGreen();
 		double blueDistance = p1.getBlue() - p2.getBlue();
