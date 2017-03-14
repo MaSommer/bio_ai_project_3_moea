@@ -54,8 +54,6 @@ public class HelpMethods {
 				}
 				c++;
 			}
-			System.out.println(result.length);
-			System.out.println(result[0].length);
 		}
 		return createPixelNeighbours(result);
 	}
@@ -67,7 +65,6 @@ public class HelpMethods {
 		for (int i = 0; i < height; i++) {
 			for (int j = 0; j < width; j++) {
 				pixelList.add(pixels[i][j]);
-				System.out.println("id:" + pixels[i][j].getId());
 			}
 		}
 		return pixelList;
