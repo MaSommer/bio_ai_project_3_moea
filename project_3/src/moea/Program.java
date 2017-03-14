@@ -20,7 +20,6 @@ public class Program {
 	
 	public static void main(String[] args) throws IOException {
 		Pixel[][] pixels = HelpMethods.createImagePixelByPixel("Test Image/1/Test image.jpg");
-		System.out.println("h");
 		HelpMethods.drawImage(pixels);
 	}
 

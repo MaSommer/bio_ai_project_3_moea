@@ -8,20 +8,28 @@ public class Pixel {
 	private int green;
 	private int blue;
 	private int alpha;
+	private int id;
 	private boolean hasAlphaChannel;
-	private ArrayList<Pixel> neighbours;
 	
-	public Pixel(int red, int green, int blue, int alpha, boolean hasAlphaChannel){
+	//{west, north, east, south}
+	private Pixel[] neighbours;
+	
+	public Pixel(int red, int green, int blue, int alpha, boolean hasAlphaChannel, int id){
 		this.red = red;
 		this.green = green;
 		this.blue = blue;
 		this.alpha = alpha;
+		this.id = id;
 		this.hasAlphaChannel = hasAlphaChannel;
-		neighbours = new ArrayList<Pixel>();
+		neighbours = new Pixel[4];
 	}
 	
 	public int getRed() {
 		return red;
+	}
+	
+	public int getId(){
+		return id;
 	}
 	
 	public boolean hasAlphaChannel(){
@@ -40,16 +48,16 @@ public class Pixel {
 		return blue;
 	}
 
-	public ArrayList<Pixel> getNeighbours() {
+	public Pixel[] getNeighbours() {
 		return neighbours;
 	}
 	
-	public void addNeighbour(Pixel p){
-		neighbours.add(p);
-	}
-	
-	public void removeNeighbour(Pixel p){
-		neighbours.remove(p);
-	}
+//	public void addNeighbour(Pixel p){
+//		neighbours.add(p);
+//	}
+//	
+//	public void removeNeighbour(Pixel p){
+//		neighbours.remove(p);
+//	}
 
 }
