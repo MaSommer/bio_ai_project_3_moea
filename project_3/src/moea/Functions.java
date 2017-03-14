@@ -4,7 +4,7 @@ import java.util.ArrayList;
 
 public class Functions {
 	
-	public double pixelDeviation(ArrayList<Double> centeroid, Pixel p2){
+	public static double pixelDeviation(ArrayList<Double> centeroid, Pixel p2){
 		double redDistance =centeroid.get(0)-p2.getRed();
 		double greenDistance = centeroid.get(1) - p2.getGreen();
 		double blueDistance = centeroid.get(2) - p2.getBlue();
@@ -26,7 +26,7 @@ public class Functions {
 		return Math.pow(notSquaredDev, 0.5);
 	}
 	
-	public double segmentDeviation(ArrayList<Pixel> segment){
+	public static double segmentDeviation(ArrayList<Pixel> segment){
 		double deviation = 0;
 		double red = 0;
 		double green = 0;
@@ -49,11 +49,11 @@ public class Functions {
 	
 	}
 	
-	public double segmentConnectivityValue(ArrayList<Pixel> segment, Pixel p){
+	public static double segmentConnectivityValue(ArrayList<Pixel> segment, Pixel p){
 		int counter = 1;
 		double connectivityValue = 0;
 		for(Pixel neighbour: p.getNeighbours()){
-			if(!segment.contains(p)){
+			if(!segment.contains(neighbour)){
 				connectivityValue+=1/counter;
 				counter++;
 			}
@@ -74,7 +74,7 @@ public class Functions {
 		return edge;
 	}
 	
-	public double segmentEdgeValue(ArrayList<Pixel> segment){
+	public static double segmentEdgeValue(ArrayList<Pixel> segment){
 		double edgeValue = 0;
 		ArrayList<Pixel> edges = getEdge(segment);
 		for(Pixel p: edges){
@@ -88,11 +88,6 @@ public class Functions {
 		
 		return edgeValue;
 	}
-	
-	
-	
-	
-	
 	
 	
 	
