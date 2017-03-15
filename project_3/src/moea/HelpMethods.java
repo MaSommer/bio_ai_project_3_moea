@@ -144,7 +144,6 @@ public class HelpMethods {
 			pixelsMST.add(null);
 		}
 		int randomPixel = (int)(Math.random()*pixels.size());
-		System.out.println("Random: " + randomPixel);
 		Pixel bestPixel = pixels.get(randomPixel);
 		pixelsMST.set(bestPixel.getId(), bestPixel);
 		long startTime = System.nanoTime();
@@ -204,7 +203,7 @@ public class HelpMethods {
 		ArrayList<ArrayList<Pixel>> population = new ArrayList<ArrayList<Pixel>>();
 		ArrayList<Edge> edges = generateEdges(pixelsMST, pixelsMap);
 		for (int i = 0; i < populationSize; i++) {
-			ArrayList<Pixel> cuttedChromosome = cutIntoSegments(i, pixelsMST, (ArrayList<Edge>) edges.clone(), pixelsMap);
+			ArrayList<Pixel> cuttedChromosome = cutIntoSegments(i+1, pixelsMST, (ArrayList<Edge>) edges.clone(), pixelsMap);
 			population.add(cuttedChromosome);
 		}
 		return population;
@@ -214,13 +213,13 @@ public class HelpMethods {
 		ArrayList<Pixel> cuttedPixels = (ArrayList<Pixel>) pixels.clone();
 		for (int i = 0; i < numberOfSegments; i++) {
 			Edge maxEdge = Collections.max(edges, new Comparator<Edge>() {
-			    public int compare(Edge e1, Edge e2) {
-			        if (e1.getWeight() > e2.getWeight())
-			            return 1;
-			        else if (e1.getWeight() < e2.getWeight())
-			            return -1;
-			        return 0;
-			    }
+				public int compare(Edge e1, Edge e2) {
+					if (e1.getWeight() > e2.getWeight())
+						return 1;
+					else if (e1.getWeight() < e2.getWeight())
+						return -1;
+					return 0;
+				}
 			});
 			cuttedPixels.set(maxEdge.getFrom().getId(), pixelsMap.get(maxEdge.getFrom().getId()));
 			edges.remove(maxEdge);
@@ -232,14 +231,14 @@ public class HelpMethods {
 		ArrayList<Edge> edgeList = new ArrayList<Edge>();
 		for (int i = 0; i < pixelsMST.size(); i++) {
 			double cost = pixelMap.get(i).getDistance(pixelsMST.get(i));
-			double minCost = INF;
-			for (Pixel neighbourPixel : pixelMap.get(i).getNeighbours()) {
-				if (pixelMap.get(i).getDistance(neighbourPixel) < minCost){
-					minCost = pixelMap.get(i).getDistance(neighbourPixel);
-				}
-			}
+//			double minCost = INF;
+//			for (Pixel neighbourPixel : pixelMap.get(i).getNeighbours()) {
+//				if (pixelMap.get(i).getDistance(neighbourPixel) < minCost){
+//					minCost = pixelMap.get(i).getDistance(neighbourPixel);
+//				}
+//			}
 			//dividing on minCost for normalizing to avoid choosing edge which gives a segment with few pixels and another with a lot pixels. 
-			Edge edge = new Edge(pixelMap.get(i), pixelsMST.get(i), cost/minCost);
+			Edge edge = new Edge(pixelMap.get(i), pixelsMST.get(i), cost);
 			edgeList.add(edge);
 		}
 		return edgeList;
