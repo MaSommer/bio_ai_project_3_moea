@@ -9,6 +9,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.PriorityQueue;
 
 import javax.imageio.ImageIO;
@@ -253,18 +254,18 @@ public class HelpMethods {
 		return pixelMap;
 	}
 	
-	public static ArrayList<ArrayList<Pixel>> createPopulation(ArrayList<Pixel> pixelsMST, int populationSize, HashMap<Integer, Pixel> pixelsMap){
-		ArrayList<ArrayList<Pixel>> population = new ArrayList<ArrayList<Pixel>>();
-		ArrayList<Edge> edges = generateEdges(pixelsMST, pixelsMap);
+	public static ArrayList<Chromosome> createPopulation(ArrayList<Pixel> pixelsMST, int populationSize, ArrayList<Pixel> pixels){
+		ArrayList<Chromosome> population = new ArrayList<Chromosome>();
+		ArrayList<Edge> edges = generateEdges(pixelsMST, pixels);
 		for (int i = 0; i < populationSize; i++) {
-			ArrayList<Pixel> cuttedChromosome = cutIntoSegments(i+1, pixelsMST, (ArrayList<Edge>) edges.clone(), pixelsMap);
-			population.add(cuttedChromosome);
+			ArrayList<Pixel> cuttedChromosome = cutIntoSegments(i+1, pixelsMST, (ArrayList<Edge>) edges.clone(), pixels);
+			population.add(new Chromosome(cuttedChromosome, pixels));
 		}
 		return population;
 	}
 	
-	public static ArrayList<Pixel> cutIntoSegments(int numberOfSegments, ArrayList<Pixel> pixels, ArrayList<Edge> edges, HashMap<Integer, Pixel> pixelsMap){
-		ArrayList<Pixel> cuttedPixels = (ArrayList<Pixel>) pixels.clone();
+	public static ArrayList<Pixel> cutIntoSegments(int numberOfSegments, ArrayList<Pixel> pixelsMST, ArrayList<Edge> edges, ArrayList<Pixel> pixels){
+		ArrayList<Pixel> cuttedPixels = (ArrayList<Pixel>) pixelsMST.clone();
 		for (int i = 0; i < numberOfSegments; i++) {
 			Edge maxEdge = Collections.max(edges, new Comparator<Edge>() {
 				public int compare(Edge e1, Edge e2) {
@@ -275,16 +276,16 @@ public class HelpMethods {
 					return 0;
 				}
 			});
-			cuttedPixels.set(maxEdge.getFrom().getId(), pixelsMap.get(maxEdge.getFrom().getId()));
+			cuttedPixels.set(maxEdge.getFrom().getId(), pixels.get(maxEdge.getFrom().getId()));
 			edges.remove(maxEdge);
 		}
 		return cuttedPixels;
 	}
 	
-	public static ArrayList<Edge> generateEdges(ArrayList<Pixel> pixelsMST, HashMap<Integer, Pixel> pixelMap){
+	public static ArrayList<Edge> generateEdges(ArrayList<Pixel> pixelsMST, ArrayList<Pixel> pixels){
 		ArrayList<Edge> edgeList = new ArrayList<Edge>();
 		for (int i = 0; i < pixelsMST.size(); i++) {
-			double cost = pixelMap.get(i).getDistance(pixelsMST.get(i));
+			double cost = pixels.get(i).getDistance(pixelsMST.get(i));
 //			double minCost = INF;
 //			for (Pixel neighbourPixel : pixelMap.get(i).getNeighbours()) {
 //				if (pixelMap.get(i).getDistance(neighbourPixel) < minCost){
@@ -292,7 +293,7 @@ public class HelpMethods {
 //				}
 //			}
 			//dividing on minCost for normalizing to avoid choosing edge which gives a segment with few pixels and another with a lot pixels. 
-			Edge edge = new Edge(pixelMap.get(i), pixelsMST.get(i), cost);
+			Edge edge = new Edge(pixels.get(i), pixelsMST.get(i), cost);
 			edgeList.add(edge);
 		}
 		return edgeList;
@@ -306,30 +307,42 @@ public class HelpMethods {
 	
 	public static ArrayList<ArrayList<Pixel>> decodeChromosome(ArrayList<Pixel> chromosome, ArrayList<Pixel> pixels){
 		long startTime = System.nanoTime();
+		long endTime = System.nanoTime();
+		long duration = (endTime - startTime);
 		ArrayList<ArrayList<Pixel>> decodedChromosome = new ArrayList<ArrayList<Pixel>>();
 		ArrayList<Boolean> visited = new ArrayList<Boolean>();
 		for(int i = 0 ; i < chromosome.size(); i++){
 			visited.add(false);
 		}
 		int index = -1;
+		int lastStartIndex = 0;
 		Pixel newPixel=null;
+		double count1 = 0;
+		double count2 = 0;
+		double count3 = 0;
+		double count4 = 0;
 		
+		long startTime3 = System.nanoTime();
 		while(visited.contains(false)){
+			
 			ArrayList<Pixel> chain = new ArrayList<Pixel>(); //Ny kjede som foelges til en ende
-			for(int i = 0 ; i < visited.size(); i++){    //finner foerste ledige sted aa starte fra
+			for(int i = lastStartIndex ; i < visited.size(); i++){    //finner foerste ledige sted aa starte fra
 				if(!visited.get(i)){
 					index = i;
+					lastStartIndex = i;
 					chain.add(pixels.get(index));
 					break;
 				}
 			}
 			Boolean visitedFound = false;
 
+			long startTime2 = System.nanoTime();
 			while(!visitedFound){
 				Boolean tempFix = false;
 				if(visited.get(index)){   //Sjekker at vi ikke har vaert innom foer. Hvis vi har det, saa skal vi avslutte kjedesoeket.
 					if(!tempFix)
 						newPixel = chromosome.get(index);
+					long startTime1 = System.nanoTime();
 					for(ArrayList<Pixel> segment:decodedChromosome){
 						if(segment.contains(newPixel)){								//Finner hvilken gruppe som inneholder den noden kjeden er knyttet til.
 							HelpMethods.mergeArrayList(segment, chain);			//Legger inn kjeden til ritig segment i dekodet kromosom.
@@ -337,6 +350,9 @@ public class HelpMethods {
 							break;
 						}
 					}
+					long endTime1 = System.nanoTime();
+					long duration1 = (endTime1 - startTime1);
+					count1+= duration1;
 					if(visitedFound){
 						break;
 					}
@@ -353,10 +369,18 @@ public class HelpMethods {
 					tempFix=true;												//Legger til ubesoekt node i segmentet. 
 				}
 			}
+			long endTime2 = System.nanoTime();
+			long duration2 = (endTime2 - startTime2);
+			count2 += duration2;
 		}
-		long endTime = System.nanoTime();
-		long duration = (endTime - startTime);
-		System.out.println("decodeChromosome: " + duration/Math.pow(10, 9) + " sec");
+		long endTime3 = System.nanoTime();
+		long duration3 = (endTime3 - startTime3);
+		count3 += duration3;
+		count3 -= (count2+count1);
+		count2 -= count1;
+		endTime = System.nanoTime();
+		duration = (endTime - startTime);
+		System.out.println("decodeChromosome: " + duration/Math.pow(10, 9) + " sec, count1: " + count1/Math.pow(10, 9) + ", count2: "+count2/Math.pow(10, 9)+ ", count3: "+count3/Math.pow(10, 9));
 		return decodedChromosome;
 	}
 	
@@ -367,6 +391,14 @@ public class HelpMethods {
 				pixel.paintGreen();
 			}
 		}
+	}
+	
+	public static ArrayList<ArrayList<Pixel>> generateSegmentEdges(ArrayList<ArrayList<Pixel>> segments){
+		ArrayList<ArrayList<Pixel>> segmentEdges = new ArrayList<ArrayList<Pixel>>();
+		for (ArrayList segment : segments) {
+			segmentEdges.add(Functions.getEdge(segment));
+		}
+		return segmentEdges;
 	}
 	
 

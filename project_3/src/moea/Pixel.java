@@ -29,6 +29,20 @@ public class Pixel {
 		neighbourDistances = new ArrayList<Double>();
 	}
 	
+	public Pixel(Pixel another){
+		this.red = another.red;
+		this.green = another.green;
+		this.blue = another.blue;
+		this.alpha = another.alpha;
+		this.id = another.id;
+		this.hasAlphaChannel = another.hasAlphaChannel;
+		this.neighbours = new ArrayList<Pixel>();
+		for (Pixel neigh : another.neighbours) {
+			this.neighbours.add(new Pixel(neigh));
+		}
+		this.neighbourDistances = another.neighbourDistances;
+	}
+	
 	public int getRed() {
 		return red;
 	}
@@ -81,5 +95,26 @@ public class Pixel {
 		this.red = 21;
 		this.green = 250;
 		this.blue = 4;
+	}
+	
+	public static void main(String[] args) {
+		Pixel p = new Pixel(0,0,0,0,false,1);
+		Pixel p1 = new Pixel(0,0,0,0,false,2);
+		Pixel p2 = new Pixel(0,0,0,0,false,3);
+		Pixel p3 = new Pixel(0,0,0,0,false,4);
+		p.addNeighbour(p1);
+		p.addNeighbour(p2);
+		p.addNeighbour(p3);
+		p1.addNeighbour(p);
+		p1.addNeighbour(p2);
+		p1.addNeighbour(p3);
+		p2.addNeighbour(p);
+		p2.addNeighbour(p1);
+		p2.addNeighbour(p3);
+		p3.addNeighbour(p);
+		p3.addNeighbour(p1);
+		p3.addNeighbour(p2);
+		new Pixel(p1);
+		System.out.println(p.getId());
 	}
 }

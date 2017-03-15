@@ -6,7 +6,7 @@ import java.util.HashMap;
 
 public class Program {
 	private ArrayList<Pixel> pixels;
-	private ArrayList<ArrayList<Pixel>> population;
+	private ArrayList<Chromosome> population;
 	private ArrayList<ArrayList<Pixel>> image;
 	private HashMap<Integer, Pixel> pixelMap;
 	private int maxSegments;
@@ -26,7 +26,6 @@ public class Program {
 		this.mRate = mRate;
 		this.elitesToNextGen = elitesToNextGen;
 		this.pSize = pSize;
-		this.population = new ArrayList<ArrayList<Pixel>>();
 		this.image = new ArrayList<ArrayList<Pixel>>();
 		this.pixels = new ArrayList<Pixel>();
 		this.imagePath = imagePath;
@@ -40,9 +39,8 @@ public class Program {
 		this.pixelMap = HelpMethods.generatePixelMap(pixels);
 		this.image = HelpMethods.generateImage(pixels1);
 		ArrayList<Pixel> pixelsMST = HelpMethods.minimumSpanningTree2(pixels);
-		this.population = HelpMethods.createPopulation(pixelsMST, pSize, pixelMap);
+		this.population = HelpMethods.createPopulation(pixelsMST, pSize, pixels);
 		
-		HelpMethods.paintEdgesGreen(HelpMethods.decodeChromosome(population.get(population.size()-1), pixels));
 		HelpMethods.drawImage(image);
 	}
 	
