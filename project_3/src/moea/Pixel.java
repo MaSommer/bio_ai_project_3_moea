@@ -1,5 +1,6 @@
 package moea;
 
+import java.awt.Color;
 import java.util.ArrayList;
 
 public class Pixel {
@@ -75,5 +76,10 @@ public class Pixel {
 		}
 		return neighbourDistances.get(index);
 	}
-
+	
+	public void paintGreen(){
+		this.red = 21;
+		this.green = 250;
+		this.blue = 4;
+	}
 }

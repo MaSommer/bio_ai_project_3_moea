@@ -9,7 +9,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
-
+import java.util.PriorityQueue;
 
 import javax.imageio.ImageIO;
 import javax.swing.JFrame;
@@ -185,9 +185,62 @@ public class HelpMethods {
 					count++;
 				}
 			}
-//			if (count % 2000 == 0){
-//				System.out.println("Nr. " + count + " Duration: " + duration/Math.pow(10, 9) + "sec");				
-//			}	
+			if (count % 2000 == 0){
+				System.out.println("Nr. " + count + " Duration: " + duration/Math.pow(10, 9) + "sec");				
+			}	
+		}
+		return pixelsMST;
+	}
+	public static ArrayList<Pixel> minimumSpanningTree2(ArrayList<Pixel> pixels){
+		ArrayList<Pixel> pixelsMST = new ArrayList<Pixel>();
+		Comparator<Edge> edgeComparator = new Comparator<Edge>() {
+			public int compare(Edge e1, Edge e2)
+			{
+				return Double.compare(e1.getWeight(), e2.getWeight());
+			}
+		};
+		PriorityQueue<Edge> edges = new PriorityQueue<Edge>(10, edgeComparator);
+		for (int i = 0; i < pixels.size(); i++) {
+			pixelsMST.add(null);
+		}
+		int randomPixel = (int)(Math.random()*pixels.size());
+		Pixel bestPixel = pixels.get(randomPixel);
+		pixelsMST.set(bestPixel.getId(), bestPixel);
+		long startTime = System.nanoTime();
+		while (pixelsMST.contains(null)){
+			for (Pixel neighbourPixel : bestPixel.getNeighbours()) {
+				if (pixelsMST.get(neighbourPixel.getId()) == null){
+					Edge edge = new Edge(neighbourPixel, bestPixel, neighbourPixel.getDistance(bestPixel));
+					edges.add(edge);	
+				}
+			}
+			Edge bestEdge = edges.poll();
+			bestPixel = bestEdge.getFrom();
+			Pixel bestRetPixel = bestEdge.getTo();
+//			System.out.println("bestID: " + bestPixel.getId());
+//			System.out.println("beestRetID: " + bestRetPixel.getId());
+			pixelsMST.set(bestPixel.getId(), bestRetPixel);
+			ArrayList<Edge> edgesToRemove = new ArrayList<Edge>();
+			for (Edge edge : edges) {
+				if (edge.getFrom().getId() == bestPixel.getId()){
+					edgesToRemove.add(edge);
+				}
+			}
+			for (Edge edge : edgesToRemove) {
+				edges.remove(edge);
+			}
+			
+			long endTime = System.nanoTime();
+			long duration = (endTime - startTime);
+			int count = 0;
+			for (Pixel pixel2 : pixelsMST) {
+				if (pixel2 != null){
+					count++;
+				}
+			}
+			if (count % 2000 == 0){
+				System.out.println("Nr. " + count + " Duration: " + duration/Math.pow(10, 9) + "sec");				
+			}	
 		}
 		return pixelsMST;
 	}
@@ -252,6 +305,7 @@ public class HelpMethods {
 	}
 	
 	public static ArrayList<ArrayList<Pixel>> decodeChromosome(ArrayList<Pixel> chromosome, ArrayList<Pixel> pixels){
+		long startTime = System.nanoTime();
 		ArrayList<ArrayList<Pixel>> decodedChromosome = new ArrayList<ArrayList<Pixel>>();
 		ArrayList<Boolean> visited = new ArrayList<Boolean>();
 		for(int i = 0 ; i < chromosome.size(); i++){
@@ -259,9 +313,7 @@ public class HelpMethods {
 		}
 		int index = -1;
 		Pixel newPixel=null;
-
-
-
+		
 		while(visited.contains(false)){
 			ArrayList<Pixel> chain = new ArrayList<Pixel>(); //Ny kjede som foelges til en ende
 			for(int i = 0 ; i < visited.size(); i++){    //finner foerste ledige sted aa starte fra
@@ -302,8 +354,19 @@ public class HelpMethods {
 				}
 			}
 		}
-		System.out.println(visited);
+		long endTime = System.nanoTime();
+		long duration = (endTime - startTime);
+		System.out.println("decodeChromosome: " + duration/Math.pow(10, 9) + " sec");
 		return decodedChromosome;
+	}
+	
+	public static void paintEdgesGreen(ArrayList<ArrayList<Pixel>> segments){
+		for (ArrayList<Pixel> segment : segments) {
+			ArrayList<Pixel> edgePixels = Functions.getEdge(segment);
+			for (Pixel pixel : edgePixels) {
+				pixel.paintGreen();
+			}
+		}
 	}
 	
 
