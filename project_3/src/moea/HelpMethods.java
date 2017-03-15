@@ -4,6 +4,7 @@ import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferByte;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 
 import javax.imageio.ImageIO;
 import javax.swing.JFrame;
@@ -115,5 +116,68 @@ public class HelpMethods {
         frame.setLocationRelativeTo( null );
         frame.setVisible( true );
 	}
+	
+	public static void mergeArrayList(ArrayList<Pixel> a1, ArrayList<Pixel> a2){
+		for(Pixel p:a2){
+			a1.add(p);
+		}
+	}
+	
+	public static ArrayList<ArrayList<Pixel>> decodeChromosome(ArrayList<Pixel> chromosome, ArrayList<Pixel> pixels){
+		ArrayList<ArrayList<Pixel>> decodedChromosome = new ArrayList<ArrayList<Pixel>>();
+		ArrayList<Boolean> visited = new ArrayList<Boolean>();
+		for(int i = 0 ; i < chromosome.size(); i++){
+			visited.add(false);
+		}
+		int index = -1;
+		Pixel newPixel=null;
+
+
+
+		while(visited.contains(false)){
+			ArrayList<Pixel> chain = new ArrayList<Pixel>(); //Ny kjede som foelges til en ende
+			for(int i = 0 ; i < visited.size(); i++){    //finner foerste ledige sted aa starte fra
+				if(!visited.get(i)){
+					index = i;
+					chain.add(pixels.get(index));
+					break;
+				}
+			}
+			Boolean visitedFound = false;
+
+			while(!visitedFound){
+				Boolean tempFix = false;
+				if(visited.get(index)){   //Sjekker at vi ikke har vaert innom foer. Hvis vi har det, saa skal vi avslutte kjedesoeket.
+					if(!tempFix)
+						newPixel = chromosome.get(index);
+					for(ArrayList<Pixel> segment:decodedChromosome){
+						if(segment.contains(newPixel)){								//Finner hvilken gruppe som inneholder den noden kjeden er knyttet til.
+							HelpMethods.mergeArrayList(segment, chain);			//Legger inn kjeden til ritig segment i dekodet kromosom.
+							visitedFound = true;
+							break;
+						}
+					}
+					if(visitedFound){
+						break;
+					}
+					decodedChromosome.add(chain);
+					break;
+				}
+
+				visited.set(index, true);
+				newPixel = chromosome.get(index);									//Hvis vi ikke har besoekt den nye kjeden, saa finner vi hvilket pixel som ligger paa den nye indexen.
+
+				index = newPixel.getId();
+				if(!visited.get(index)){
+					chain.add(newPixel);
+					tempFix=true;												//Legger til ubesoekt node i segmentet. 
+				}
+			}
+		}
+		System.out.println(visited);
+		return decodedChromosome;
+	}
+	
+
 
 }
