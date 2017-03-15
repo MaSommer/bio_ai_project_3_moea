@@ -8,12 +8,14 @@ public class Program {
 	private ArrayList<Pixel> pixels;
 	private ArrayList<ArrayList<Pixel>> population;
 	private ArrayList<ArrayList<Pixel>> image;
+	private HashMap<Integer, Pixel> pixelMap;
 	private int maxSegments;
 	private int minPixelsInSegment;
 	private double mRate;
 	private int elitesToNextGen;
 	private int pSize;
 	private String imagePath;
+	
 	
 	
 	
@@ -34,13 +36,17 @@ public class Program {
 	public void init() throws IOException{
 		Pixel[][] pixels1 = HelpMethods.createImagePixelByPixel(imagePath);
 		this.pixels = HelpMethods.generatePixelList(pixels1);
+		//Refers to the pixel with id as same as the key
+		this.pixelMap = HelpMethods.generatePixelMap(pixels);
 		this.image = HelpMethods.generateImage(pixels1);
+		ArrayList<Pixel> pixelsMST = HelpMethods.minimumSpanningTree(pixels);
+		this.population = HelpMethods.createPopulation(pixelsMST, pSize, pixelMap);
 	}
 	
 	
 	
 	public static void main(String[] args) throws IOException {
-		String imagePath = "Test Image/1/Test image.jpg";
+		String imagePath = "Test Image/yellow_shit.jpg";
 		int maxSegments = 10;
 		int minPixelsInSegment = 10;
 		double mRate = 0.5;
