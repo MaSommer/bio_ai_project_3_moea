@@ -49,7 +49,15 @@ public class Functions {
 	
 	}
 	
-	public static double segmentConnectivityValue(ArrayList<Pixel> segment, Pixel p){
+	public static double segmentConnectivity(ArrayList<Pixel> segment){
+		double connectivity = 0;
+		for (Pixel pixel : segment) {
+			connectivity += segmentConnectivityValue(segment, pixel);
+		}
+		return connectivity;
+	}
+	
+	private static double segmentConnectivityValue(ArrayList<Pixel> segment, Pixel p){
 		int counter = 1;
 		double connectivityValue = 0;
 		for(Pixel neighbour: p.getNeighbours()){
@@ -78,18 +86,15 @@ public class Functions {
 		return edge;
 	}
 	
-	public static double segmentEdgeValue(ArrayList<Pixel> segment){
+	public static double segmentEdgeValue(ArrayList<Pixel> segmentEdges, ArrayList<Pixel> segment){
 		double edgeValue = 0;
-		ArrayList<Pixel> edges = getEdge(segment);
-		for(Pixel p: edges){
+		for(Pixel p: segmentEdges){
 			for(Pixel neighbour: p.getNeighbours()){
 				if(!segment.contains(neighbour)){
 					edgeValue-= pixelToPixelDeviation(p, neighbour);
 				}
 			}
 		}
-		
-		
 		return edgeValue;
 	}
 	
