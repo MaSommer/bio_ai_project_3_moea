@@ -8,12 +8,14 @@ public class Program {
 	private ArrayList<Pixel> pixels;
 	private ArrayList<ArrayList<Pixel>> population;
 	private ArrayList<ArrayList<Pixel>> image;
+	private HashMap<Integer, Pixel> pixelMap;
 	private int maxSegments;
 	private int minPixelsInSegment;
 	private double mRate;
 	private int elitesToNextGen;
 	private int pSize;
 	private String imagePath;
+	
 	
 	
 	
@@ -34,7 +36,14 @@ public class Program {
 	public void init() throws IOException{
 		Pixel[][] pixels1 = HelpMethods.createImagePixelByPixel(imagePath);
 		this.pixels = HelpMethods.generatePixelList(pixels1);
+		//Refers to the pixel with id as same as the key
+		this.pixelMap = HelpMethods.generatePixelMap(pixels);
 		this.image = HelpMethods.generateImage(pixels1);
+		ArrayList<Pixel> pixelsMST = HelpMethods.minimumSpanningTree2(pixels);
+		this.population = HelpMethods.createPopulation(pixelsMST, pSize, pixelMap);
+		
+		HelpMethods.paintEdgesGreen(HelpMethods.decodeChromosome(population.get(population.size()-1), pixels));
+		HelpMethods.drawImage(image);
 	}
 	
 	
@@ -45,7 +54,7 @@ public class Program {
 		int minPixelsInSegment = 10;
 		double mRate = 0.5;
 		int elitesToNextGen = 100;
-		int pSize = 100;
+		int pSize = 3;
 		Program p = new Program(imagePath, maxSegments, minPixelsInSegment, mRate, elitesToNextGen, pSize);
 		p.init();
 	}

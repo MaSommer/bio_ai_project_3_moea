@@ -1,5 +1,6 @@
 package moea;
 
+import java.awt.Color;
 import java.util.ArrayList;
 
 public class Pixel {
@@ -26,9 +27,6 @@ public class Pixel {
 		this.hasAlphaChannel = hasAlphaChannel;
 		neighbours = new ArrayList<Pixel>();
 		neighbourDistances = new ArrayList<Double>();
-		for(Pixel neighbour: neighbours){
-			neighbourDistances.add(Functions.pixelToPixelDeviation(this, neighbour));
-		}
 	}
 	
 	public int getRed() {
@@ -67,11 +65,21 @@ public class Pixel {
 		neighbours.remove(p);
 	}
 	
-
+	public ArrayList<Double> getNeighbourDistances(){
+		return neighbourDistances;
+	}
 	
 	public double getDistance(Pixel neighbour){
 		int index = neighbours.indexOf(neighbour);
+		if (neighbour.equals(this)){
+			return 0;
+		}
 		return neighbourDistances.get(index);
 	}
-
+	
+	public void paintGreen(){
+		this.red = 21;
+		this.green = 250;
+		this.blue = 4;
+	}
 }

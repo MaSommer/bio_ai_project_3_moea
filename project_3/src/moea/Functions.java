@@ -16,7 +16,7 @@ public class Functions {
 	}
 	
 	public static double pixelToPixelDeviation(Pixel p1, Pixel p2){
-		double redDistance =p1.getRed()-p2.getRed();
+		double redDistance = p1.getRed()-p2.getRed();
 		double greenDistance = p1.getGreen() - p2.getGreen();
 		double blueDistance = p1.getBlue() - p2.getBlue();
 		
@@ -62,15 +62,19 @@ public class Functions {
 	}
 	
 	public static ArrayList<Pixel> getEdge(ArrayList<Pixel> segment){
+		long startTime = System.nanoTime();
 		ArrayList<Pixel> edge = new ArrayList<Pixel>();
 		for(Pixel p : segment){
 			for(Pixel neighbour: p.getNeighbours()){
-				if(!segment.contains(neighbour)){
+				if(!segment.contains(neighbour) || p.getNeighbours().size() < 4){
 					edge.add(p);
 					break;
 				}
 			}
 		}
+		long endTime = System.nanoTime();
+		long duration = (endTime - startTime);
+		System.out.println("getEdge: " + duration/Math.pow(10, 9) + " sec");
 		return edge;
 	}
 	
