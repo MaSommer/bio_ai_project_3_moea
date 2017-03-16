@@ -257,7 +257,6 @@ public class HelpMethods {
 				}
 			});
 			Pixel pixel = maxEdge.getFrom();
-//			System.out.println("MAXEDGE CUT SHI: " +maxEdge.getWeight());
 			cuttedPixels.set(maxEdge.getFrom().getId(), pixels.get(maxEdge.getFrom().getId()));
 			edges.remove(maxEdge);
 			edges.add(new Edge(pixel, pixel, 0));

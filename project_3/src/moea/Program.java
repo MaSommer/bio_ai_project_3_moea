@@ -1,5 +1,7 @@
 package moea;
 
+import java.io.BufferedReader;
+import java.io.FileReader;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
@@ -39,9 +41,29 @@ public class Program {
 		//Refers to the pixel with id as same as the key
 		this.pixelMap = HelpMethods.generatePixelMap(pixels);
 		this.image = HelpMethods.generateImage(pixels1);
+
+		
+		BufferedReader br = new BufferedReader(new FileReader("palme.txt"));	
+		ArrayList<Pixel> pixelsMST1 = new ArrayList<Pixel>();
+		String line = "";
+		line = br.readLine();
+		System.out.println(line);
+		while((line = br.readLine()) != null){
+			pixelsMST1.add(pixels.get(Integer.parseInt(line)));
+			System.out.println("cock");
+		}
+		br.close();
+		
+//		ArrayList<Pixel> pixelsMST1 = fa.readMST(pixels, "palme.txt");
 		ArrayList<Pixel> pixelsMST = HelpMethods.minimumSpanningTree2(pixels);
+		for (int i = 0; i < pixelsMST.size(); i++) {
+			if (!pixelsMST.get(i).equals(pixelsMST1.get(i))){
+				throw new IllegalArgumentException("kukeri");
+			}
+		}
+		System.exit(0);
+//		ArrayList<Pixel> pixelsMST = HelpMethods.minimumSpanningTree2(pixels);
 //		FileAdministrator fa = new FileAdministrator("Test image1");
-//		fa.writeMST(pixelsMST);
 //		System.exit(0);
 //		System.out.println(new Chromosome(pixelsMST, pixels, 0).getSegments().size());
 //		int size = pixelsMST.size()-1;

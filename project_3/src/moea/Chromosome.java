@@ -39,7 +39,7 @@ public class Chromosome {
 		long endTime1 = System.nanoTime();
 		long duration1 = (endTime1 - startTime1);
 //		System.out.println("Update fitness values: " + duration1/Math.pow(10, 9) + " sec");
-		updateFitnessValue();
+		updateFitnessParameters();
 	}
 	
 	public Chromosome(Chromosome copy){
@@ -76,7 +76,7 @@ public class Chromosome {
 		representation.set(fromPixelIndex, toSwapIn);
 	}
 	
-	private void updateFitnessValue(){
+	private void updateFitnessParameters(){
 		updateSegmentFitnessValues();
 		this.deviationFitness = 0;
 		this.edgeFitness = 0;
@@ -87,14 +87,16 @@ public class Chromosome {
 			edgeFitness += segmentFitness[1];
 			connectivityFitness += segmentFitness[2];
 		}
-		this.fitnessValue = Variables.deviationWeight * deviationFitness + Variables.edgeFitnessWeight * edgeFitness + Variables.connectivityWeight * connectivityFitness;
 	}
 	
 	public void updateChromosome(){
 		decodeChromosome(pixels); //Assume the representation has changed. Now we decode the chromosome
 		this.segmentEdges = HelpMethods.generateSegmentEdges(segments, pixelToSegment);
-		updateFitnessValue();
-		
+		updateFitnessParameters();
+	}
+	
+	public void setFitnessValue(double fitnessValue){
+		this.fitnessValue = fitnessValue;
 	}
 	
 	public double getDeviationFitness() {

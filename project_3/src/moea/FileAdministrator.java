@@ -29,14 +29,19 @@ public class FileAdministrator {
 		writer.close();
 	}
 	
-	public ArrayList<Pixel> readMST(ArrayList<Pixel> pixels) throws IOException{
-		BufferedReader br = new BufferedReader(new FileReader(filename));
+	public ArrayList<Pixel> readMST(ArrayList<Pixel> pixels, String filename) throws IOException{
+		FileReader fr = new FileReader(filename);
+		System.out.println(fr.ready());
+		BufferedReader br = new BufferedReader(new FileReader(filename));	
+
+		
 		ArrayList<Pixel> pixelsMST = new ArrayList<Pixel>();
 		String line = "";
 		while((line = br.readLine()) != null){
 			pixelsMST.add(pixels.get(Integer.parseInt(line)));
+			System.out.println("cock");
 		}
-		
+		br.close();
 		return pixelsMST;
 	}
 
