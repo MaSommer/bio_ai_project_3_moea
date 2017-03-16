@@ -9,8 +9,9 @@ public class Chromosome {
 	private ArrayList<Pixel> representation;
 	private ArrayList<ArrayList<Pixel>> segmentEdges;
 	private ArrayList<Integer> pixelToSegment;
-	private double fintessValue;
+	private double fitnessValue;
 	private int id;
+	private ArrayList<Pixel> pixels;
 
 	private double deviationFitness;
 	private double edgeFitness;
@@ -23,6 +24,7 @@ public class Chromosome {
 		System.out.println("CHROMOSOME NR " + id);
 		this.representation = representation;
 		this.id = id;
+		this.pixels = pixels;
 		decodeChromosome(pixels);
 		long startTime = System.nanoTime();
 		this.segmentEdges = HelpMethods.generateSegmentEdges(segments, pixelToSegment);
@@ -31,7 +33,7 @@ public class Chromosome {
 		System.out.println("Segment edges: "+ duration/Math.pow(10, 9) + " sec");
 		segmentFitnessValues = new ArrayList<double[]>();
 		long startTime1 = System.nanoTime();
-		updateFitnessValuesInitially();
+		updateSegmentFitnessValues();
 		long endTime1 = System.nanoTime();
 		long duration1 = (endTime1 - startTime1);
 		System.out.println("Update fitness values: " + duration1/Math.pow(10, 9) + " sec");
@@ -39,7 +41,7 @@ public class Chromosome {
 		System.out.println();
 	}
 	
-	private void updateFitnessValuesInitially(){
+	private void updateSegmentFitnessValues(){
 		int segmentNr = 0;
 		for (ArrayList<Pixel> segment : segments) {
 			double deviation = Functions.segmentDeviation(segment);
@@ -51,20 +53,38 @@ public class Chromosome {
 		}
 	}
 	
+	public void mutate(){
+		int fromPixelIndex = (int) (representation.size() * Math.random());
+		Pixel fromPixel = pixels.get(fromPixelIndex);
+		
+		ArrayList<Pixel> neighbours = fromPixel.getNeighbours();
+		
+		int toSwapInIndex = (int) (Math.random()*(neighbours.size()-1));
+		Pixel toSwapIn = neighbours.get(toSwapInIndex);
+		
+		representation.set(fromPixelIndex, toSwapIn);
+		updateChromosome();
+	}
+	
 	private void updateFitnessValue(){
 		this.deviationFitness = 0;
 		this.edgeFitness = 0;
 		this.connectivityFitness = 0;
-		this.fintessValue = 0;
+		this.fitnessValue = 0;
 		for (double[] segmentFitness : segmentFitnessValues) {
 			deviationFitness += segmentFitness[0];
 			edgeFitness += segmentFitness[1];
 			connectivityFitness += segmentFitness[2];
 		}
-		this.fintessValue = Variables.deviationWeight * deviationFitness + Variables.edgeFitnessWeight * edgeFitness + Variables.connectivityWeight * connectivityFitness;
+		this.fitnessValue = Variables.deviationWeight * deviationFitness + Variables.edgeFitnessWeight * edgeFitness + Variables.connectivityWeight * connectivityFitness;
 	}
 	
 	public void updateChromosome(){
+		decodeChromosome(pixels); //Assume the representation has changed. Now we decode the chromosome
+		this.segmentEdges = HelpMethods.generateSegmentEdges(segments, pixelToSegment);
+		segmentFitnessValues = new ArrayList<double[]>();
+		updateSegmentFitnessValues();
+		updateFitnessValue();
 		
 	}
 	
@@ -77,7 +97,7 @@ public class Chromosome {
 	}
 
 	public double getFintessValue() {
-		return fintessValue;
+		return fitnessValue;
 	}
 	
 	public ArrayList<ArrayList<Pixel>> getSegmentEdges(){
