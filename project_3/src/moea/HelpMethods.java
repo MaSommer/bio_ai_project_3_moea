@@ -218,15 +218,12 @@ public class HelpMethods {
 		return pixelMap;
 	}
 	
-	public static ArrayList<Chromosome> createPopulation(ArrayList<Pixel> pixelsMST, int populationSize, ArrayList<Pixel> pixels){
-		System.out.println("1");
+	public static ArrayList<Chromosome> createPopulation(ArrayList<Pixel> pixelsMST, int populationSize, ArrayList<Pixel> pixels, HashMap<Pixel, ArrayList<Integer>> mapPixelToIndex){
 		ArrayList<Chromosome> population = new ArrayList<Chromosome>();
-		ArrayList<Edge> edges = generateEdges(pixelsMST, pixels);
-		System.out.println("2");
+		ArrayList<Edge> edges = generateEdges(pixelsMST, pixels, mapPixelToIndex);
 		for (int i = 0; i < populationSize; i++) {
 			long startTime = System.nanoTime();
 			ArrayList<Pixel> cuttedChromosome = cutIntoSegments(i+1, pixelsMST, (ArrayList<Edge>) edges.clone(), pixels);
-			System.out.println("3");
 			population.add(new Chromosome(cuttedChromosome, pixels, i+1));
 			if(population.size() >0){
 				ArrayList<ArrayList<Pixel>> segments = population.get(0).getSegments();
@@ -275,27 +272,21 @@ public class HelpMethods {
 		return cuttedPixels;
 	}
 	
-	public static ArrayList<Edge> generateEdges(ArrayList<Pixel> pixelsMST, ArrayList<Pixel> pixels){
+	public static ArrayList<Edge> generateEdges(ArrayList<Pixel> pixelsMST, ArrayList<Pixel> pixels, HashMap<Pixel, ArrayList<Integer>> mapPixelToIndex){
 		ArrayList<Edge> edgeList = new ArrayList<Edge>();
 		for (int i = 0; i < pixelsMST.size(); i++) {
-			double cost = pixels.get(i).getDistance(pixelsMST.get(i));
-//			double minCost = cost;
-//			for (Pixel p : pixelsMST) {
-//				if (p.getId() ==  pixels.get(i).getId()){
-//					double weight = p.getDistance(pixels.get(i));
-//					minCost += weight;
-//					if (weight < minCost){
-//					}
-//				}
-//			}
-//			for (Pixel neighbourPixel : pixels.get(i).getNeighbours()) {
-//				if (pixels.get(i).getDistance(neighbourPixel) < minCost){
-//					minCost = pixels.get(i).getDistance(neighbourPixel);
-//				}
-//			}
+			Pixel p = pixels.get(i);
+			double cost = p.getDistance(pixelsMST.get(i));
+			double minCost = cost;
+			for (Integer index : mapPixelToIndex.get(p)) {
+				double weight = pixels.get(index).getDistance(p);
+				if (weight < minCost){
+					minCost += weight;
+				}				
+			}
 			//dividing on minCost for normalizing to avoid choosing edge which gives a segment with few pixels and another with a lot pixels. 
 			
-			Edge edge = new Edge(pixels.get(i), pixelsMST.get(i), cost);
+			Edge edge = new Edge(pixels.get(i), pixelsMST.get(i), cost/(minCost+0.00000000001));
 			edgeList.add(edge);
 		}
 		return edgeList;
@@ -394,13 +385,17 @@ public class HelpMethods {
 	
 	public static HashMap<Pixel, ArrayList<Integer>> createMapPixelToIndex(ArrayList<Pixel> representation){
 		HashMap<Pixel, ArrayList<Integer>> mapPixelToIndex = new HashMap<Pixel, ArrayList<Integer>>();
-//		for (Pixel pixel : representation) {
-//			if (mapPixelToIndex.get(pixel) == null){
-//				ArrayList<Integer> 
-//			}
-//			mapPixelToIndex.put
-//		}
-		
+		for (int i = 0; i < representation.size(); i++) {
+			Pixel pixel = representation.get(i);
+			if (mapPixelToIndex.get(pixel) == null){
+				ArrayList<Integer> indexes = new ArrayList<Integer>();
+				indexes.add(i);
+				mapPixelToIndex.put(pixel, indexes);
+			}
+			else{
+				mapPixelToIndex.get(pixel).add(i);
+			}
+		}
 		return mapPixelToIndex;
 	}
 	

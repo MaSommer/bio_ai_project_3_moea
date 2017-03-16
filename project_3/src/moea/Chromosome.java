@@ -8,6 +8,7 @@ public class Chromosome {
 	private ArrayList<ArrayList<Pixel>> segments;
 	private ArrayList<Pixel> representation;
 	private ArrayList<ArrayList<Pixel>> segmentEdges;
+	private HashMap<Pixel, ArrayList<Integer>> mapPixelToIndex;
 	private ArrayList<Integer> pixelToSegment;
 	private double fintessValue;
 	private int id;
@@ -22,24 +23,23 @@ public class Chromosome {
 	public Chromosome(ArrayList<Pixel> representation, ArrayList<Pixel> pixels, int id){
 		System.out.println("CHROMOSOME NR " + id);
 		this.representation = representation;
+		segmentFitnessValues = new ArrayList<double[]>();
 		this.id = id;
+		
 		decodeChromosome(pixels);
 		long startTime = System.nanoTime();
 		this.segmentEdges = HelpMethods.generateSegmentEdges(segments, pixelToSegment);
 		long endTime = System.nanoTime();
 		long duration = (endTime - startTime);
 		System.out.println("Segment edges: "+ duration/Math.pow(10, 9) + " sec");
-		segmentFitnessValues = new ArrayList<double[]>();
-		long startTime1 = System.nanoTime();
-		updateFitnessValuesInitially();
-		long endTime1 = System.nanoTime();
-		long duration1 = (endTime1 - startTime1);
-		System.out.println("Update fitness values: " + duration1/Math.pow(10, 9) + " sec");
+		
+		mapPixelToIndex = HelpMethods.createMapPixelToIndex(representation);
+		
 		updateFitnessValue();
 		System.out.println();
 	}
 	
-	private void updateFitnessValuesInitially(){
+	private void updateFitnessValuesForEachSegment(){
 		int segmentNr = 0;
 		for (ArrayList<Pixel> segment : segments) {
 			double deviation = Functions.segmentDeviation(segment);
@@ -52,6 +52,7 @@ public class Chromosome {
 	}
 	
 	private void updateFitnessValue(){
+		updateFitnessValuesForEachSegment();
 		this.deviationFitness = 0;
 		this.edgeFitness = 0;
 		this.connectivityFitness = 0;
@@ -61,6 +62,7 @@ public class Chromosome {
 			edgeFitness += segmentFitness[1];
 			connectivityFitness += segmentFitness[2];
 		}
+		
 		this.fintessValue = Variables.deviationWeight * deviationFitness + Variables.edgeFitnessWeight * edgeFitness + Variables.connectivityWeight * connectivityFitness;
 	}
 	
