@@ -19,6 +19,9 @@ public class Variables {
 	public static double edgeFitnessWeight = 1;	
 	public static double connectivityWeight = 0;
 	
+	//{active deviation, active edgevalue, active connectivity}
+	public static boolean[] activeObjectives = {true, true, true};
+	
 	//choose randomly between the two chromosomes if not
 	public static double selectBestChromosomeRate = 0.8;
 	
