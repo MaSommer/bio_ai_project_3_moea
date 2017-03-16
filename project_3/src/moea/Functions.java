@@ -49,32 +49,36 @@ public class Functions {
 	
 	}
 	
-	public static double segmentConnectivity(ArrayList<Pixel> segment){
+	public static double segmentConnectivity(ArrayList<Pixel> segment, int segmentNr, ArrayList<Integer> pixelsToSegment){
 		double connectivity = 0;
 		for (Pixel pixel : segment) {
-			connectivity += segmentConnectivityValue(segment, pixel);
+			connectivity += segmentConnectivityValue(segment, pixel, segmentNr, pixelsToSegment);
 		}
 		return connectivity;
 	}
 	
-	private static double segmentConnectivityValue(ArrayList<Pixel> segment, Pixel p){
+	private static double segmentConnectivityValue(ArrayList<Pixel> segment, Pixel p, int segmentNr, ArrayList<Integer> pixelsToSegment){
 		int counter = 1;
 		double connectivityValue = 0;
 		for(Pixel neighbour: p.getNeighbours()){
-			if(!segment.contains(neighbour)){
+			if (pixelsToSegment.get(neighbour.getId()) == segmentNr){
 				connectivityValue+=1/counter;
-				counter++;
+				counter++;				
 			}
+//			if(!segment.contains(neighbour)){
+//				connectivityValue+=1/counter;
+//				counter++;
+//			}
 		}
 		return connectivityValue;
 	}
 	
-	public static ArrayList<Pixel> getEdge(ArrayList<Pixel> segment){
+	public static ArrayList<Pixel> getEdge(ArrayList<Pixel> segment, int segmentNr, ArrayList<Integer> pixelToSegment){
 		long startTime = System.nanoTime();
 		ArrayList<Pixel> edge = new ArrayList<Pixel>();
 		for(Pixel p : segment){
 			for(Pixel neighbour: p.getNeighbours()){
-				if(!segment.contains(neighbour) || p.getNeighbours().size() < 4){
+				if (pixelToSegment.get(neighbour.getId()) != segmentNr){
 					edge.add(p);
 					break;
 				}
@@ -82,17 +86,20 @@ public class Functions {
 		}
 		long endTime = System.nanoTime();
 		long duration = (endTime - startTime);
-		System.out.println("getEdge: " + duration/Math.pow(10, 9) + " sec");
+//		System.out.println("getEdge: " + duration/Math.pow(10, 9) + " sec");
 		return edge;
 	}
 	
-	public static double segmentEdgeValue(ArrayList<Pixel> segmentEdges, ArrayList<Pixel> segment){
+	public static double segmentEdgeValue(ArrayList<Pixel> segmentEdges, ArrayList<Pixel> segment, int segmentNr, ArrayList<Integer> pixelsToSegment){
 		double edgeValue = 0;
 		for(Pixel p: segmentEdges){
 			for(Pixel neighbour: p.getNeighbours()){
-				if(!segment.contains(neighbour)){
-					edgeValue-= pixelToPixelDeviation(p, neighbour);
+				if (pixelsToSegment.get(neighbour.getId()) == segmentNr){
+					edgeValue-= pixelToPixelDeviation(p, neighbour);					
 				}
+//				if(!segment.contains(neighbour)){
+//					edgeValue-= pixelToPixelDeviation(p, neighbour);
+//				}
 			}
 		}
 		return edgeValue;
