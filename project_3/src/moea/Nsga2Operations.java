@@ -96,7 +96,6 @@ public class Nsga2Operations {
 		HashMap<Integer,ArrayList<Chromosome>> frontiers = new HashMap<Integer,ArrayList<Chromosome>>();
 		HashMap<Chromosome,Integer> dominationCount= new HashMap<Chromosome,Integer>();
 		HashMap<Chromosome,ArrayList<Chromosome>> dominates = new HashMap<Chromosome, ArrayList<Chromosome>>();
-		HashMap<Chromosome,Integer> rank = new HashMap<Chromosome,Integer>();
 		
 
 		for(Chromosome p:population){
@@ -119,7 +118,6 @@ public class Nsga2Operations {
 					ArrayList<Chromosome> frontier1 = new ArrayList<Chromosome>();
 				}
 				frontiers.get(1).add(p);
-				rank.put(p, 1);
 			}
 		}
 		int i = 1;
@@ -134,7 +132,6 @@ public class Nsga2Operations {
 					dominationCount.put(q, domCount);
 					if(domCount ==0){
 						nextFront.add(q);
-						rank.put(q, i+1);
 					}
 				}
 			}

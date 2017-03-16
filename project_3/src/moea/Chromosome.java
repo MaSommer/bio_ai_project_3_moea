@@ -49,6 +49,46 @@ public class Chromosome {
 		this.connectivityFitness = copy.connectivityFitness;
 	}
 	
+	public static ArrayList<Chromosome> testFrontierChromosomes(){
+		ArrayList<Pixel> repr = new ArrayList<Pixel>();
+		ArrayList<Chromosome> pop = new ArrayList<Chromosome>();
+		double[][] fitnessValues = {{3,3,3},{1,4,4}, {4,2,6}, {0,3,4}, {2,5,6}, {3,6,7}, {3,3,4}, {1,4,5}, {5,6,3}, {1,7,9} };
+		for(int i = 0 ; i < fitnessValues.length ; i++){
+			Chromosome chr1 = new Chromosome(repr, repr, 1);
+			double[] fitnesses = fitnessValues[i];
+			chr1.setConnectivityFitness(fitnesses[0]);
+			chr1.setDeviationFitness(fitnesses[1]);
+			chr1.setEdgeFitness(fitnesses[2]);
+			pop.add(chr1);
+		}
+		return pop;
+	}
+	public static ArrayList<Chromosome> testCrowdChromosomes(){
+		ArrayList<Pixel> repr = new ArrayList<Pixel>();
+		ArrayList<Chromosome> pop = new ArrayList<Chromosome>();
+		double[][] fitnessValues = {{35,7,1},{10,16,22}, {45,1,39}, {1,2,9}, {6,11,30}, {27,4,15}, {80,37,4}, {15,22,49}, {3,50,73}, {21,29,60}};
+		for(int i = 0 ; i < fitnessValues.length ; i++){
+			Chromosome chr1 = new Chromosome(repr, repr, i+1);
+			double[] fitnesses = fitnessValues[i];
+			chr1.setConnectivityFitness(fitnesses[0]);
+			chr1.setDeviationFitness(fitnesses[1]);
+			chr1.setEdgeFitness(fitnesses[2]);
+			pop.add(chr1);
+		}
+		return pop;
+	}
+
+	public void setDeviationFitness(double deviationFitness) {
+		this.deviationFitness = deviationFitness;
+	}
+
+	public void setEdgeFitness(double edgeFitness) {
+		this.edgeFitness = edgeFitness;
+	}
+
+	public void setConnectivityFitness(double connectivityFitness) {
+		this.connectivityFitness = connectivityFitness;
+	}
 
 	private void updateSegmentFitnessValues(){
 		int segmentNr = 0;
@@ -88,6 +128,7 @@ public class Chromosome {
 			connectivityFitness += segmentFitness[2];
 		}
 	}
+	
 	
 	public void updateChromosome(){
 		decodeChromosome(pixels); //Assume the representation has changed. Now we decode the chromosome
