@@ -6,7 +6,7 @@ public class Variables {
 	public static int minPixelsInSegment = 10;
 	public static double mRate = 0.5;
 	public static int elitesToNextGen = 100;
-	public static int pSize = 3;
+	public static int pSize = 20;
 	
 	public static boolean optimizeDeviation = true;
 	public static boolean optimizeEdgeFitness = true;

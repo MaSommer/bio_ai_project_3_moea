@@ -96,25 +96,25 @@ public class HelpMethods {
 		int width = pixels[0].length;
 		for (int i = 0; i < height; i++) {
 			for (int j = 0; j < width; j++) {
+//				if ((pixels[i][j].getRed() != 0 || pixels[i][j].getGreen() != 0|| pixels[i][j].getBlue() != 0) &&( pixels[i][j].getRed() != 255 || pixels[i][j].getGreen() != 255 || pixels[i][j].getBlue() != 255)){
+//					System.out.println(pixels[i][j].getRed() +  " " +pixels[i][j].getGreen() + " " +pixels[i][j].getBlue());
+//				}
 				ArrayList<Pixel> neighbours = pixels[i][j].getNeighbours();
 				//insert west neighbour
 				if (j != 0){
-					neighbours.add(pixels[i][j-1]);
+					pixels[i][j].addNeighbour((pixels[i][j-1]));
 				}
 				//insert north neighbour
 				if (i != 0){
-					neighbours.add(pixels[i-1][j]);
+					pixels[i][j].addNeighbour(pixels[i-1][j]);
 				}
 				//insert east neighbour
 				if (j != width-1){
-					neighbours.add(pixels[i][j+1]);
+					pixels[i][j].addNeighbour(pixels[i][j+1]);
 				}
 				//insert south neighbour
 				if (i != height-1){
-					neighbours.add(pixels[i+1][j]);
-				}
-				for(Pixel neighbour: neighbours){
-					pixels[i][j].getNeighbourDistances().add(Functions.pixelToPixelDeviation(pixels[i][j], neighbour));
+					pixels[i][j].addNeighbour(pixels[i+1][j]);
 				}
 			}
 		}
@@ -139,76 +139,32 @@ public class HelpMethods {
 		frame.setLocationRelativeTo( null );
 		frame.setVisible( true );
 	}
-	public static ArrayList<Pixel> minimumSpanningTree(ArrayList<Pixel> pixels){
-		ArrayList<Pixel> pixelsMST = new ArrayList<Pixel>();
-		ArrayList<Edge> edges = new ArrayList<Edge>();
-		for (int i = 0; i < pixels.size(); i++) {
-			pixelsMST.add(null);
-		}
-		int randomPixel = (int)(Math.random()*pixels.size());
-		Pixel bestPixel = pixels.get(randomPixel);
-		pixelsMST.set(bestPixel.getId(), bestPixel);
-		long startTime = System.nanoTime();
-		while (pixelsMST.contains(null)){
-			for (Pixel neighbourPixel : bestPixel.getNeighbours()) {
-				if (pixelsMST.get(neighbourPixel.getId()) == null){
-					Edge edge = new Edge(neighbourPixel, bestPixel, neighbourPixel.getDistance(bestPixel));
-					edges.add(edge);					
-				}
-			}
-			Collections.sort(edges, new Comparator<Edge>() {
-				public int compare(Edge e1, Edge e2)
-				{
-					return Double.compare(e1.getWeight(), e2.getWeight());
-				}
-			});
-			bestPixel = edges.get(0).getFrom();
-			Pixel bestRetPixel = edges.get(0).getTo();
-//			System.out.println("bestID: " + bestPixel.getId());
-//			System.out.println("beestRetID: " + bestRetPixel.getId());
-			edges.remove(0);
-			pixelsMST.set(bestPixel.getId(), bestRetPixel);
-			ArrayList<Edge> edgesToRemove = new ArrayList<Edge>();
-			for (Edge edge : edges) {
-				if (edge.getFrom().getId() == bestPixel.getId()){
-					edgesToRemove.add(edge);
-				}
-			}
-			for (Edge edge : edgesToRemove) {
-				edges.remove(edge);
-			}
-
-			long endTime = System.nanoTime();
-			long duration = (endTime - startTime);
-			int count = 0;
-			for (Pixel pixel2 : pixelsMST) {
-				if (pixel2 != null){
-					count++;
-				}
-			}
-			if (count % 2000 == 0){
-				System.out.println("Nr. " + count + " Duration: " + duration/Math.pow(10, 9) + "sec");				
-			}	
-		}
-		return pixelsMST;
-	}
+	
 	public static ArrayList<Pixel> minimumSpanningTree2(ArrayList<Pixel> pixels){
 		ArrayList<Pixel> pixelsMST = new ArrayList<Pixel>();
+		int pixelsRemaining = pixels.size()-1;
 		Comparator<Edge> edgeComparator = new Comparator<Edge>() {
-			public int compare(Edge e1, Edge e2)
-			{
-				return Double.compare(e1.getWeight(), e2.getWeight());
+			public int compare(Edge e1, Edge e2){
+				if (e1.getWeight() > e2.getWeight()){
+					return 1;
+				}
+				else if (e1.getWeight() < e2.getWeight()){
+					return -1;
+				}
+				else {
+					return 0;
+				}
 			}
 		};
-		PriorityQueue<Edge> edges = new PriorityQueue<Edge>(10, edgeComparator);
+		PriorityQueue<Edge> edges = new PriorityQueue<Edge>(edgeComparator);
 		for (int i = 0; i < pixels.size(); i++) {
 			pixelsMST.add(null);
 		}
 		int randomPixel = (int)(Math.random()*pixels.size());
-		Pixel bestPixel = pixels.get(randomPixel);
+		Pixel bestPixel = pixels.get(0);
 		pixelsMST.set(bestPixel.getId(), bestPixel);
 		long startTime = System.nanoTime();
-		while (pixelsMST.contains(null)){
+		while (pixelsRemaining > 0){
 			for (Pixel neighbourPixel : bestPixel.getNeighbours()) {
 				if (pixelsMST.get(neighbourPixel.getId()) == null){
 					Edge edge = new Edge(neighbourPixel, bestPixel, neighbourPixel.getDistance(bestPixel));
@@ -221,6 +177,7 @@ public class HelpMethods {
 //			System.out.println("bestID: " + bestPixel.getId());
 //			System.out.println("beestRetID: " + bestRetPixel.getId());
 			pixelsMST.set(bestPixel.getId(), bestRetPixel);
+			pixelsRemaining--;
 			ArrayList<Edge> edgesToRemove = new ArrayList<Edge>();
 			for (Edge edge : edges) {
 				if (edge.getFrom().getId() == bestPixel.getId()){
@@ -240,7 +197,13 @@ public class HelpMethods {
 				}
 			}
 			if (count % 2000 == 0){
-				System.out.println("Nr. " + count + " Duration: " + duration/Math.pow(10, 9) + "sec");				
+//				for (int i = 0; i < 100; i++) {
+//					System.out.println("round: " + count + " This is the wight!: "+edges.poll().getWeight());						
+//					
+//				}
+//				for (Edge edge : edges) {
+//				}
+				System.out.println("Nr. " + count + " Duration: " + duration/Math.pow(10, 9) + "sec");	
 			}	
 		}
 		return pixelsMST;
@@ -255,11 +218,37 @@ public class HelpMethods {
 	}
 	
 	public static ArrayList<Chromosome> createPopulation(ArrayList<Pixel> pixelsMST, int populationSize, ArrayList<Pixel> pixels){
+		System.out.println("1");
 		ArrayList<Chromosome> population = new ArrayList<Chromosome>();
 		ArrayList<Edge> edges = generateEdges(pixelsMST, pixels);
+		System.out.println("2");
 		for (int i = 0; i < populationSize; i++) {
+			long startTime = System.nanoTime();
 			ArrayList<Pixel> cuttedChromosome = cutIntoSegments(i+1, pixelsMST, (ArrayList<Edge>) edges.clone(), pixels);
-			population.add(new Chromosome(cuttedChromosome, pixels));
+			System.out.println("3");
+			population.add(new Chromosome(cuttedChromosome, pixels, i+1));
+			if(population.size() >0){
+				ArrayList<ArrayList<Pixel>> segments = population.get(0).getSegments();
+				double red = 0 ;
+				double green = 0;
+				double blue = 0;
+				int counter = 0;
+				for(ArrayList<Pixel> segment : segments){
+					for(Pixel p:segment){
+						red+=p.getRed();
+						green+=p.getGreen();
+						blue+=p.getBlue();
+					}
+					counter++;
+					red = red/segment.size();
+					green = green/segment.size();
+					blue = blue/segment.size();
+					System.out.println("Segment "+counter+ "\tsize: " +segment.size() + "\tAvg red: " +red + "\tAvg green: "+green+ "\tAvg blue: "+blue );
+				}
+			}
+			long endTime = System.nanoTime();
+			long duration = endTime - startTime;
+			System.out.println("Total duration: " + duration/Math.pow(10, 9) + " sec");
 		}
 		return population;
 	}
@@ -276,8 +265,11 @@ public class HelpMethods {
 					return 0;
 				}
 			});
+			Pixel pixel = maxEdge.getFrom();
+//			System.out.println("MAXEDGE CUT SHI: " +maxEdge.getWeight());
 			cuttedPixels.set(maxEdge.getFrom().getId(), pixels.get(maxEdge.getFrom().getId()));
 			edges.remove(maxEdge);
+			edges.add(new Edge(pixel, pixel, 0));
 		}
 		return cuttedPixels;
 	}
@@ -286,13 +278,22 @@ public class HelpMethods {
 		ArrayList<Edge> edgeList = new ArrayList<Edge>();
 		for (int i = 0; i < pixelsMST.size(); i++) {
 			double cost = pixels.get(i).getDistance(pixelsMST.get(i));
-//			double minCost = INF;
-//			for (Pixel neighbourPixel : pixelMap.get(i).getNeighbours()) {
-//				if (pixelMap.get(i).getDistance(neighbourPixel) < minCost){
-//					minCost = pixelMap.get(i).getDistance(neighbourPixel);
+//			double minCost = cost;
+//			for (Pixel p : pixelsMST) {
+//				if (p.getId() ==  pixels.get(i).getId()){
+//					double weight = p.getDistance(pixels.get(i));
+//					minCost += weight;
+//					if (weight < minCost){
+//					}
+//				}
+//			}
+//			for (Pixel neighbourPixel : pixels.get(i).getNeighbours()) {
+//				if (pixels.get(i).getDistance(neighbourPixel) < minCost){
+//					minCost = pixels.get(i).getDistance(neighbourPixel);
 //				}
 //			}
 			//dividing on minCost for normalizing to avoid choosing edge which gives a segment with few pixels and another with a lot pixels. 
+			
 			Edge edge = new Edge(pixels.get(i), pixelsMST.get(i), cost);
 			edgeList.add(edge);
 		}
@@ -307,24 +308,21 @@ public class HelpMethods {
 	
 	public static ArrayList<ArrayList<Pixel>> decodeChromosome(ArrayList<Pixel> chromosome, ArrayList<Pixel> pixels){
 		long startTime = System.nanoTime();
-		long endTime = System.nanoTime();
-		long duration = (endTime - startTime);
 		ArrayList<ArrayList<Pixel>> decodedChromosome = new ArrayList<ArrayList<Pixel>>();
 		ArrayList<Boolean> visited = new ArrayList<Boolean>();
+		ArrayList<Integer> pixelToSegment = new ArrayList<Integer>();
+		int remainingPixels = pixels.size();
 		for(int i = 0 ; i < chromosome.size(); i++){
 			visited.add(false);
+			pixelToSegment.add(null);
 		}
 		int index = -1;
 		int lastStartIndex = 0;
 		Pixel newPixel=null;
-		double count1 = 0;
-		double count2 = 0;
-		double count3 = 0;
-		double count4 = 0;
 		
 		long startTime3 = System.nanoTime();
-		while(visited.contains(false)){
-			
+		int chainNr = 0;
+		while(remainingPixels > 0){
 			ArrayList<Pixel> chain = new ArrayList<Pixel>(); //Ny kjede som foelges til en ende
 			for(int i = lastStartIndex ; i < visited.size(); i++){    //finner foerste ledige sted aa starte fra
 				if(!visited.get(i)){
@@ -334,29 +332,30 @@ public class HelpMethods {
 					break;
 				}
 			}
-			Boolean visitedFound = false;
 
-			long startTime2 = System.nanoTime();
-			while(!visitedFound){
+			while(true){
 				Boolean tempFix = false;
 				if(visited.get(index)){   //Sjekker at vi ikke har vaert innom foer. Hvis vi har det, saa skal vi avslutte kjedesoeket.
-					if(!tempFix)
-						newPixel = chromosome.get(index);
-					long startTime1 = System.nanoTime();
-					for(ArrayList<Pixel> segment:decodedChromosome){
-						if(segment.contains(newPixel)){								//Finner hvilken gruppe som inneholder den noden kjeden er knyttet til.
-							HelpMethods.mergeArrayList(segment, chain);			//Legger inn kjeden til ritig segment i dekodet kromosom.
-							visitedFound = true;
-							break;
+					if(!tempFix){
+						newPixel = chromosome.get(index);						
+					}
+					if (pixelToSegment.get(index) != null){
+						HelpMethods.mergeArrayList(decodedChromosome.get(pixelToSegment.get(index)), chain);
+						for (int i = 0; i < chain.size(); i++) {
+							int ind = chain.get(i).getId();
+							pixelToSegment.set(ind, pixelToSegment.get(index));
 						}
+						remainingPixels -= chain.size();
 					}
-					long endTime1 = System.nanoTime();
-					long duration1 = (endTime1 - startTime1);
-					count1+= duration1;
-					if(visitedFound){
-						break;
+					else{
+						for (int i = 0; i < chain.size(); i++) {
+							int ind = chain.get(i).getId();
+							pixelToSegment.set(ind, chainNr);
+						}
+						decodedChromosome.add(chain);
+						chainNr++;
+						remainingPixels -= chain.size();		
 					}
-					decodedChromosome.add(chain);
 					break;
 				}
 
@@ -369,38 +368,73 @@ public class HelpMethods {
 					tempFix=true;												//Legger til ubesoekt node i segmentet. 
 				}
 			}
-			long endTime2 = System.nanoTime();
-			long duration2 = (endTime2 - startTime2);
-			count2 += duration2;
 		}
-		long endTime3 = System.nanoTime();
-		long duration3 = (endTime3 - startTime3);
-		count3 += duration3;
-		count3 -= (count2+count1);
-		count2 -= count1;
-		endTime = System.nanoTime();
-		duration = (endTime - startTime);
-		System.out.println("decodeChromosome: " + duration/Math.pow(10, 9) + " sec, count1: " + count1/Math.pow(10, 9) + ", count2: "+count2/Math.pow(10, 9)+ ", count3: "+count3/Math.pow(10, 9));
+		long endTime = System.nanoTime();
+		long duration = (endTime - startTime);
+		System.out.println("decodeChromosome: " + duration/Math.pow(10, 9));
 		return decodedChromosome;
 	}
 	
-	public static void paintEdgesGreen(ArrayList<ArrayList<Pixel>> segments){
-		for (ArrayList<Pixel> segment : segments) {
-			ArrayList<Pixel> edgePixels = Functions.getEdge(segment);
-			for (Pixel pixel : edgePixels) {
+	public static void paintEdgesGreen(Chromosome chromosome){
+		for (ArrayList<Pixel> segmentEdges : chromosome.getSegmentEdges()) {
+			for (Pixel pixel : segmentEdges) {
 				pixel.paintGreen();
 			}
 		}
 	}
 	
-	public static ArrayList<ArrayList<Pixel>> generateSegmentEdges(ArrayList<ArrayList<Pixel>> segments){
+	public static ArrayList<ArrayList<Pixel>> generateSegmentEdges(ArrayList<ArrayList<Pixel>> segments, ArrayList<Integer> pixelToSegment){
 		ArrayList<ArrayList<Pixel>> segmentEdges = new ArrayList<ArrayList<Pixel>>();
-		for (ArrayList segment : segments) {
-			segmentEdges.add(Functions.getEdge(segment));
+		for (int i = 0; i < segments.size(); i++) {
+			segmentEdges.add(Functions.getEdge(segments.get(i), i, pixelToSegment));
 		}
 		return segmentEdges;
 	}
 	
-
+	public static void selection(ArrayList<Chromosome> population){
+		
+	}
+	
+	public static void crossover(ArrayList<Chromosome> population){
+		
+	}
+	
+	public static void mutation(Chromosome mutation){
+		
+	}
+	
+//	public static void main(String[] args) {
+//		ArrayList<Pixel> pixels = new ArrayList<Pixel>();
+//		ArrayList<Pixel> chromosome = new ArrayList<Pixel>();
+//		for(int i = 0 ; i < 16 ; i++){
+//			pixels.add(new Pixel(0, 0, 0, 0, true, i));
+//		}
+//		chromosome.add(pixels.get(1));
+//		chromosome.add(pixels.get(5));
+//		chromosome.add(pixels.get(1));
+//		chromosome.add(pixels.get(3));
+//		chromosome.add(pixels.get(0));
+//		chromosome.add(pixels.get(4));
+//		chromosome.add(pixels.get(2));
+//		chromosome.add(pixels.get(3));
+//		chromosome.add(pixels.get(9));
+//		chromosome.add(pixels.get(10));
+//		chromosome.add(pixels.get(14));
+//		chromosome.add(pixels.get(7));
+//		chromosome.add(pixels.get(8));
+//		chromosome.add(pixels.get(12));
+//		chromosome.add(pixels.get(15));
+//		chromosome.add(pixels.get(15));
+//		
+//		System.out.println(HelpMethods.decodeChromosome(chromosome, pixels));
+//		
+//		
+//	}
+	
+//	public static void main(String[] args) {
+//		Pixel p1 = new Pixel(0, 0, 0, 0, false, 0);
+//		Pixel p2 = new Pixel(255, 255, 255, 0, false, 1);
+//		System.out.println(Functions.pixelToPixelDeviation(p1, p2));
+//	}
 
 }
