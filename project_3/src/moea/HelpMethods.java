@@ -161,7 +161,6 @@ public class HelpMethods {
 		for (int i = 0; i < pixels.size(); i++) {
 			pixelsMST.add(null);
 		}
-		int randomPixel = (int)(Math.random()*pixels.size());
 		Pixel bestPixel = pixels.get(0);
 		pixelsMST.set(bestPixel.getId(), bestPixel);
 		long startTime = System.nanoTime();
@@ -198,13 +197,7 @@ public class HelpMethods {
 				}
 			}
 			if (count % 2000 == 0){
-//				for (int i = 0; i < 100; i++) {
-//					System.out.println("round: " + count + " This is the wight!: "+edges.poll().getWeight());						
-//					
-//				}
-//				for (Edge edge : edges) {
-//				}
-				System.out.println("Nr. " + count + " Duration: " + duration/Math.pow(10, 9) + "sec");	
+				System.out.println(count + " edges is initialized. Duration: " + duration/Math.pow(10, 9) + " sec");	
 			}	
 		}
 		return pixelsMST;
@@ -225,25 +218,25 @@ public class HelpMethods {
 			long startTime = System.nanoTime();
 			ArrayList<Pixel> cuttedChromosome = cutIntoSegments(i+1, pixelsMST, (ArrayList<Edge>) edges.clone(), pixels);
 			population.add(new Chromosome(cuttedChromosome, pixels, i+1));
-			if(population.size() >0){
-				ArrayList<ArrayList<Pixel>> segments = population.get(0).getSegments();
-				double red = 0 ;
-				double green = 0;
-				double blue = 0;
-				int counter = 0;
-				for(ArrayList<Pixel> segment : segments){
-					for(Pixel p:segment){
-						red+=p.getRed();
-						green+=p.getGreen();
-						blue+=p.getBlue();
-					}
-					counter++;
-					red = red/segment.size();
-					green = green/segment.size();
-					blue = blue/segment.size();
-					System.out.println("Segment "+counter+ "\tsize: " +segment.size() + "\tAvg red: " +red + "\tAvg green: "+green+ "\tAvg blue: "+blue );
-				}
-			}
+//			if(population.size() >0){
+//				ArrayList<ArrayList<Pixel>> segments = population.get(0).getSegments();
+//				double red = 0 ;
+//				double green = 0;
+//				double blue = 0;
+//				int counter = 0;
+//				for(ArrayList<Pixel> segment : segments){
+//					for(Pixel p:segment){
+//						red+=p.getRed();
+//						green+=p.getGreen();
+//						blue+=p.getBlue();
+//					}
+//					counter++;
+//					red = red/segment.size();
+//					green = green/segment.size();
+//					blue = blue/segment.size();
+//					System.out.println("Segment "+counter+ "\tsize: " +segment.size() + "\tAvg red: " +red + "\tAvg green: "+green+ "\tAvg blue: "+blue );
+//				}
+//			}
 			long endTime = System.nanoTime();
 			long duration = endTime - startTime;
 			System.out.println("Total duration: " + duration/Math.pow(10, 9) + " sec");
@@ -298,74 +291,6 @@ public class HelpMethods {
 		}
 	}
 	
-	public static ArrayList<ArrayList<Pixel>> decodeChromosome(ArrayList<Pixel> chromosome, ArrayList<Pixel> pixels){
-		long startTime = System.nanoTime();
-		ArrayList<ArrayList<Pixel>> decodedChromosome = new ArrayList<ArrayList<Pixel>>();
-		ArrayList<Boolean> visited = new ArrayList<Boolean>();
-		ArrayList<Integer> pixelToSegment = new ArrayList<Integer>();
-		int remainingPixels = pixels.size();
-		for(int i = 0 ; i < chromosome.size(); i++){
-			visited.add(false);
-			pixelToSegment.add(null);
-		}
-		int index = -1;
-		int lastStartIndex = 0;
-		Pixel newPixel=null;
-		
-		long startTime3 = System.nanoTime();
-		int chainNr = 0;
-		while(remainingPixels > 0){
-			ArrayList<Pixel> chain = new ArrayList<Pixel>(); //Ny kjede som foelges til en ende
-			for(int i = lastStartIndex ; i < visited.size(); i++){    //finner foerste ledige sted aa starte fra
-				if(!visited.get(i)){
-					index = i;
-					lastStartIndex = i;
-					chain.add(pixels.get(index));
-					break;
-				}
-			}
-
-			while(true){
-				Boolean tempFix = false;
-				if(visited.get(index)){   //Sjekker at vi ikke har vaert innom foer. Hvis vi har det, saa skal vi avslutte kjedesoeket.
-					if(!tempFix){
-						newPixel = chromosome.get(index);						
-					}
-					if (pixelToSegment.get(index) != null){
-						HelpMethods.mergeArrayList(decodedChromosome.get(pixelToSegment.get(index)), chain);
-						for (int i = 0; i < chain.size(); i++) {
-							int ind = chain.get(i).getId();
-							pixelToSegment.set(ind, pixelToSegment.get(index));
-						}
-						remainingPixels -= chain.size();
-					}
-					else{
-						for (int i = 0; i < chain.size(); i++) {
-							int ind = chain.get(i).getId();
-							pixelToSegment.set(ind, chainNr);
-						}
-						decodedChromosome.add(chain);
-						chainNr++;
-						remainingPixels -= chain.size();		
-					}
-					break;
-				}
-
-				visited.set(index, true);
-				newPixel = chromosome.get(index);									//Hvis vi ikke har besoekt den nye kjeden, saa finner vi hvilket pixel som ligger paa den nye indexen.
-
-				index = newPixel.getId();
-				if(!visited.get(index)){
-					chain.add(newPixel);
-					tempFix=true;												//Legger til ubesoekt node i segmentet. 
-				}
-			}
-		}
-		long endTime = System.nanoTime();
-		long duration = (endTime - startTime);
-		System.out.println("decodeChromosome: " + duration/Math.pow(10, 9));
-		return decodedChromosome;
-	}
 	
 	public static void paintEdgesGreen(Chromosome chromosome){
 		for (ArrayList<Pixel> segmentEdges : chromosome.getSegmentEdges()) {
@@ -399,9 +324,10 @@ public class HelpMethods {
 		return mapPixelToIndex;
 	}
 	
-	public static void selection(ArrayList<Chromosome> population){
+	public static ArrayList<Chromosome> selection(ArrayList<Chromosome> population, ArrayList<Pixel> pixels){
 		long seed = System.nanoTime();
 		ArrayList<Chromosome> selectedPopulation = new ArrayList<Chromosome>();
+		selectedPopulation.add(new Chromosome(HelpMethods.findBestChromosome(population)));
 		Collections.shuffle(population, new Random(seed));	
 		
 		for (int i = 0; i < population.size()-1; i+=2) {
@@ -425,34 +351,45 @@ public class HelpMethods {
 				}
 			}
 		}
+//		population = selectedPopulation;
+		return selectedPopulation;
 	}
 	
-	public static void crossover(ArrayList<Chromosome> selectedPopulation){
+	public static ArrayList<Chromosome> crossover(ArrayList<Chromosome> selectedPopulation, ArrayList<Pixel> pixels){
 		ArrayList<Chromosome> population = new ArrayList<Chromosome>();
 		while(population.size() < Variables.pSize){
 			for(int i = 0 ; i < selectedPopulation.size()-1; i+=2){
 				Chromosome chr1 = selectedPopulation.get(i);
 				Chromosome chr2 = selectedPopulation.get(i+1);
-				ArrayList<Chromosome> children = HelpMethods.generateOffsprings(chr1, chr2, Variables.mixingRate);
+				ArrayList<Chromosome> children = HelpMethods.generateOffsprings(chr1, chr2, Variables.mixingRate, pixels);
 				population.addAll(children);
 				
 			}
 			Collections.shuffle(selectedPopulation);
 		}
-		selectedPopulation = population;
-		
+//		selectedPopulation = population;
+		return population;
 	}
 	
-	private static ArrayList<Chromosome> generateOffsprings(Chromosome chr1, Chromosome chr2, double mixingRate){
+	private static ArrayList<Chromosome> generateOffsprings(Chromosome chr1, Chromosome chr2, double mixingRate, ArrayList<Pixel> pixels){
 		ArrayList<Chromosome> offSprings = new ArrayList<Chromosome>();
 		ArrayList<Pixel> representation1 = chr1.getRepresentation();
 		ArrayList<Pixel> representation2 = chr2.getRepresentation();
 		for(int i = 0 ; i < representation1.size() ; i++){
 			if(Math.random() < mixingRate){
-				Pixel swap1 = representation1.get(i);
-				Pixel swap2 = representation2.get(i);
-				representation2.set(i, swap1);
-				representation1.set(i, swap2);
+//				Pixel swap1 = representation1.get(i);
+//				Pixel swap2 = representation2.get(i);
+//				representation2.set(i, swap1);
+//				representation1.set(i, swap2);
+				
+				int swap1index = representation1.get(i).getId();
+				int swap2index = representation2.get(i).getId();
+				
+				representation2.set(i, pixels.get(swap1index));
+				representation1.set(i, pixels.get(swap2index));
+				
+//				System.out.println("s1: " + swap1index);
+//				System.out.println("s2: " + swap2index);
 			}
 			
 		}
@@ -462,6 +399,34 @@ public class HelpMethods {
 		offSprings.add(chr2);
 		
 		return offSprings;
+	}
+	
+	public static Chromosome findBestChromosome(ArrayList<Chromosome> population){
+		Chromosome bestChr = population.get(0);
+		double bestFitness = population.get(0).getFitnessValue();
+		for (Chromosome chromosome : population) {
+			if (chromosome.getFitnessValue() < bestFitness){
+				bestChr = chromosome;
+				bestFitness = chromosome.getFitnessValue();
+			}
+		}
+		return bestChr;
+	}
+	
+	public static void mutation(ArrayList<Chromosome> population){
+		for (Chromosome chromosome : population) {
+			if (Math.random() < Variables.mutationRate){
+				chromosome.mutate();
+				chromosome.updateChromosome();
+			}
+		}
+	}
+	
+	public static void nonDominatedSort(ArrayList<Chromosome> population){
+//		ArrayList<Chromosome> 
+		for (Chromosome chromosome : population) {
+			
+		}
 	}
 	
 //	public static void main(String[] args) {

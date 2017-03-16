@@ -1,6 +1,7 @@
 package moea;
 
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -33,16 +34,15 @@ public class Program {
 
 
 	public void init() throws IOException{
-		long startTime = System.nanoTime();
 		Pixel[][] pixels1 = HelpMethods.createImagePixelByPixel(imagePath);
-		long endTime = System.nanoTime();
-		long duration = endTime - startTime;
-		System.out.println(duration/Math.pow(10, 6) + " milli seconds");
 		this.pixels = HelpMethods.generatePixelList(pixels1);
 		//Refers to the pixel with id as same as the key
 		this.pixelMap = HelpMethods.generatePixelMap(pixels);
 		this.image = HelpMethods.generateImage(pixels1);
 		ArrayList<Pixel> pixelsMST = HelpMethods.minimumSpanningTree2(pixels);
+//		FileAdministrator fa = new FileAdministrator("Test image1");
+//		fa.writeMST(pixelsMST);
+//		System.exit(0);
 //		System.out.println(new Chromosome(pixelsMST, pixels, 0).getSegments().size());
 //		int size = pixelsMST.size()-1;
 //		int count = 0;
@@ -59,12 +59,33 @@ public class Program {
 		
 		
 		this.population = HelpMethods.createPopulation(pixelsMST, pSize, pixels, HelpMethods.createMapPixelToIndex(pixels));
-		HelpMethods.paintEdgesGreen(population.get(0));
-		HelpMethods.drawImage(image);
 	}
 	
 	public void run(){
+		long startTime = System.nanoTime();
+		int generations = 1;
+		//do some mutations
+		for (int i = 0; i < 50; i++) {
+			for (Chromosome chromosome : population) {
+				chromosome.mutate();
+			}
+		}
 		
+		
+		for (int i = 0; i < Variables.numberOfGenerations; i++) {
+			ArrayList<Chromosome> selectedPopulation = HelpMethods.selection(population, pixels);
+			population = HelpMethods.crossover(selectedPopulation, pixels);
+			HelpMethods.mutation(population);
+			
+			long endTime = System.nanoTime();
+			long duration = endTime - startTime;
+			System.out.println("Generation number: " + generations + ", current best chromosome fitness: " + HelpMethods.findBestChromosome(population).getFitnessValue() + " Duration: " + duration/Math.pow(10,9)+ " sec");
+			if (generations % 50 == 0){
+			}
+			generations++;
+		}
+		HelpMethods.paintEdgesGreen(HelpMethods.findBestChromosome(population));
+		HelpMethods.drawImage(image);
 	}
 	
 	
@@ -73,6 +94,7 @@ public class Program {
 		String imagePath = "Test Image/1/Test image.jpg";
 		Program p = new Program(imagePath);
 		p.init();
+		p.run();
 	}
 
 }
