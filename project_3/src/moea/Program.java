@@ -70,7 +70,7 @@ public class Program {
 	
 	
 	public static void main(String[] args) throws IOException {
-		String imagePath = "Test Image/pi.png";
+		String imagePath = "Test Image/1/Test image.jpg";
 		Program p = new Program(imagePath);
 		p.init();
 	}
