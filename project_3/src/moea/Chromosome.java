@@ -97,6 +97,18 @@ public class Chromosome {
 		
 	}
 	
+	public double getDeviationFitness() {
+		return deviationFitness;
+	}
+
+	public double getEdgeFitness() {
+		return edgeFitness;
+	}
+
+	public double getConnectivityFitness() {
+		return connectivityFitness;
+	}
+
 	public ArrayList<ArrayList<Pixel>> getSegments() {
 		return segments;
 	}
