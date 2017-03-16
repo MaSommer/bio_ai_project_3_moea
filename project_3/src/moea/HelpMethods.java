@@ -11,6 +11,7 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.PriorityQueue;
+import java.util.Random;
 
 import javax.imageio.ImageIO;
 import javax.swing.JFrame;
@@ -391,12 +392,55 @@ public class HelpMethods {
 		return segmentEdges;
 	}
 	
+	public static HashMap<Pixel, ArrayList<Integer>> createMapPixelToIndex(ArrayList<Pixel> representation){
+		HashMap<Pixel, ArrayList<Integer>> mapPixelToIndex = new HashMap<Pixel, ArrayList<Integer>>();
+//		for (Pixel pixel : representation) {
+//			if (mapPixelToIndex.get(pixel) == null){
+//				ArrayList<Integer> 
+//			}
+//			mapPixelToIndex.put
+//		}
+		
+		return mapPixelToIndex;
+	}
+	
 	public static void selection(ArrayList<Chromosome> population){
+		long seed = System.nanoTime();
+		ArrayList<Chromosome> selectedPopulation = new ArrayList<Chromosome>();
+		Collections.shuffle(population, new Random(seed));	
+		
+		for (int i = 0; i < population.size()-1; i+=2) {
+			Chromosome chr1 = population.get(i);
+			Chromosome chr2 = population.get(i+1);
+			Chromosome fittest = chr2;
+			if (chr1.getFintessValue() < chr2.getFintessValue()){
+				fittest = chr1;
+			}
+			int random = (int)(Math.random()*2);
+			if (random < 1000*Variables.selectBestChromosomeRate){
+				selectedPopulation.add(fittest);
+			}
+			else{
+				random = (int) (Math.random()*2);
+				if (random == 0){
+					selectedPopulation.add(chr1);
+				}
+				else{
+					selectedPopulation.add(chr2);					
+				}
+			}
+		}
+	}
+	
+	public static void crossover(ArrayList<Chromosome> selectedPopulation){
 		
 	}
 	
-	public static void crossover(ArrayList<Chromosome> population){
+	public static Chromosome[] generateOffsprings(Chromosome chr1, Chromosome chr2){
+		Chromosome[] offsprings = new Chromosome[2];
 		
+		
+		return offsprings;
 	}
 	
 	public static void mutation(Chromosome mutation){
