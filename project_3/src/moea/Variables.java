@@ -12,18 +12,18 @@ public class Variables {
 	public static boolean optimizeEdgeFitness = true;
 	public static boolean optimizeConnectivity = true;
 	
-	public static double deviationWeight = 0.4;
-	public static double edgeFitnessWeight = 0.3;	
-	public static double connectivityWeight = 0.3;
+	public static double deviationWeight = 1;
+	public static double edgeFitnessWeight = 1;	
+	public static double connectivityWeight = 0;
 	
 	//choose randomly between the two chromosomes if not
 	public static double selectBestChromosomeRate = 0.8;
 	
 	public static double maximumDeviationValue = Math.sqrt(Math.pow(255, 2)+Math.pow(255, 2)+Math.pow(255, 2));
 	public static double minimumDeviationValue = 0;
-	public static double maximumEdgeValue;
-	public static double minimumEdgeValue;
-	public static double maximumConnectivityValue;
-	public static double minimumConnectivityValue;
+	public static double maximumEdgeValue = 4*Math.sqrt(Math.pow(255, 2)+Math.pow(255, 2)+Math.pow(255, 2));
+	public static double minimumEdgeValue = 0;
+	public static double maximumConnectivityValue = (1 + 1/2 + 1/3 + 1/4);
+	public static double minimumConnectivityValue = 0;
 
 }

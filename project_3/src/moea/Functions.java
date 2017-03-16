@@ -42,7 +42,7 @@ public class Functions {
 		rgbValues.add(blue/segment.size());
 		
 		for(Pixel p:segment){
-			deviation+=pixelDeviation(rgbValues,p);
+			deviation+=pixelDeviation(rgbValues,p)/Math.abs(Variables.maximumDeviationValue-Variables.minimumDeviationValue);
 		}
 		
 		return deviation;
@@ -52,29 +52,24 @@ public class Functions {
 	public static double segmentConnectivity(ArrayList<Pixel> segment, int segmentNr, ArrayList<Integer> pixelsToSegment){
 		double connectivity = 0;
 		for (Pixel pixel : segment) {
-			connectivity += segmentConnectivityValue(segment, pixel, segmentNr, pixelsToSegment);
+			connectivity += segmentConnectivityValue(pixel, segmentNr, pixelsToSegment);
 		}
 		return connectivity;
 	}
 	
-	private static double segmentConnectivityValue(ArrayList<Pixel> segment, Pixel p, int segmentNr, ArrayList<Integer> pixelsToSegment){
+	private static double segmentConnectivityValue(Pixel p, int segmentNr, ArrayList<Integer> pixelsToSegment){
 		int counter = 1;
 		double connectivityValue = 0;
 		for(Pixel neighbour: p.getNeighbours()){
 			if (pixelsToSegment.get(neighbour.getId()) == segmentNr){
-				connectivityValue+=1/counter;
+				connectivityValue += (1/counter)/Math.abs(Variables.maximumConnectivityValue-Variables.minimumConnectivityValue);
 				counter++;				
 			}
-//			if(!segment.contains(neighbour)){
-//				connectivityValue+=1/counter;
-//				counter++;
-//			}
 		}
 		return connectivityValue;
 	}
 	
 	public static ArrayList<Pixel> getEdge(ArrayList<Pixel> segment, int segmentNr, ArrayList<Integer> pixelToSegment){
-		long startTime = System.nanoTime();
 		ArrayList<Pixel> edge = new ArrayList<Pixel>();
 		for(Pixel p : segment){
 			for(Pixel neighbour: p.getNeighbours()){
@@ -84,18 +79,17 @@ public class Functions {
 				}
 			}
 		}
-		long endTime = System.nanoTime();
-		long duration = (endTime - startTime);
 //		System.out.println("getEdge: " + duration/Math.pow(10, 9) + " sec");
 		return edge;
 	}
 	
 	public static double segmentEdgeValue(ArrayList<Pixel> segmentEdges, ArrayList<Pixel> segment, int segmentNr, ArrayList<Integer> pixelsToSegment){
 		double edgeValue = 0;
+		double normalizeConstant = Math.abs(Variables.maximumEdgeValue-Variables.minimumEdgeValue);
 		for(Pixel p: segmentEdges){
 			for(Pixel neighbour: p.getNeighbours()){
 				if (pixelsToSegment.get(neighbour.getId()) == segmentNr){
-					edgeValue-= pixelToPixelDeviation(p, neighbour);					
+					edgeValue-= pixelToPixelDeviation(p, neighbour)/normalizeConstant;					
 				}
 //				if(!segment.contains(neighbour)){
 //					edgeValue-= pixelToPixelDeviation(p, neighbour);

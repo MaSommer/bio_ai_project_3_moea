@@ -62,7 +62,6 @@ public class Chromosome {
 			edgeFitness += segmentFitness[1];
 			connectivityFitness += segmentFitness[2];
 		}
-		
 		this.fintessValue = Variables.deviationWeight * deviationFitness + Variables.edgeFitnessWeight * edgeFitness + Variables.connectivityWeight * connectivityFitness;
 	}
 	
