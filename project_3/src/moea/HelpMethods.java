@@ -157,7 +157,7 @@ public class HelpMethods {
 				}
 			}
 		};
-		PriorityQueue<Edge> edges = new PriorityQueue<Edge>(edgeComparator);
+		PriorityQueue<Edge> edges = new PriorityQueue<Edge>(10, edgeComparator);
 		for (int i = 0; i < pixels.size(); i++) {
 			pixelsMST.add(null);
 		}
@@ -408,7 +408,7 @@ public class HelpMethods {
 			Chromosome chr1 = population.get(i);
 			Chromosome chr2 = population.get(i+1);
 			Chromosome fittest = chr2;
-			if (chr1.getFintessValue() < chr2.getFintessValue()){
+			if (chr1.getFitnessValue() < chr2.getFitnessValue()){
 				fittest = chr1;
 			}
 			int random = (int)(Math.random()*2);
@@ -428,18 +428,40 @@ public class HelpMethods {
 	}
 	
 	public static void crossover(ArrayList<Chromosome> selectedPopulation){
+		ArrayList<Chromosome> population = new ArrayList<Chromosome>();
+		while(population.size() < Variables.pSize){
+			for(int i = 0 ; i < selectedPopulation.size()-1; i+=2){
+				Chromosome chr1 = selectedPopulation.get(i);
+				Chromosome chr2 = selectedPopulation.get(i+1);
+				ArrayList<Chromosome> children = HelpMethods.generateOffsprings(chr1, chr2, Variables.mixingRate);
+				population.addAll(children);
+				
+			}
+			Collections.shuffle(selectedPopulation);
+		}
+		selectedPopulation = population;
 		
 	}
 	
-	public static Chromosome[] generateOffsprings(Chromosome chr1, Chromosome chr2){
-		Chromosome[] offsprings = new Chromosome[2];
+	private static ArrayList<Chromosome> generateOffsprings(Chromosome chr1, Chromosome chr2, double mixingRate){
+		ArrayList<Chromosome> offSprings = new ArrayList<Chromosome>();
+		ArrayList<Pixel> representation1 = chr1.getRepresentation();
+		ArrayList<Pixel> representation2 = chr2.getRepresentation();
+		for(int i = 0 ; i < representation1.size() ; i++){
+			if(Math.random() < mixingRate){
+				Pixel swap1 = representation1.get(i);
+				Pixel swap2 = representation2.get(i);
+				representation2.set(i, swap1);
+				representation1.set(i, swap2);
+			}
+			
+		}
+		chr1.updateChromosome();
+		chr2.updateChromosome();
+		offSprings.add(chr1);
+		offSprings.add(chr2);
 		
-		
-		return offsprings;
-	}
-	
-	public static void mutation(Chromosome mutation){
-		
+		return offSprings;
 	}
 	
 //	public static void main(String[] args) {
