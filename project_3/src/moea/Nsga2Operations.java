@@ -10,8 +10,32 @@ import java.util.Map;
 
 public class Nsga2Operations {
 	
+	public static ArrayList<Chromosome> selection(ArrayList<Chromosome> population){
+		ArrayList<Chromosome> selectedChromosome = new ArrayList<Chromosome>();
+		HashMap<Integer, ArrayList<Chromosome>> frontierMap = fastNonDominatedSort(population);
+		crowdingDistanceAssignment(frontierMap);
+		Collections.shuffle(population);
+		Iterator it = frontierMap.entrySet().iterator();
+		while(it.hasNext() && selectedChromosome.size() < population.size()){
+			Map.Entry pair = (Map.Entry)it.next();
+			//sorts after highest distance
+			Collections.sort((ArrayList<Chromosome>) pair.getValue(), new Comparator<Chromosome>() {
+				public int compare(Chromosome chr1, Chromosome chr2) {
+					return -Double.compare(chr1.getFitnessValue(), chr2.getFitnessValue());
+				}
+			});
+			ArrayList<Chromosome> chromosomesFromFronteie = (ArrayList<Chromosome>) pair.getValue();
+			int i = 0;
+			while (i < chromosomesFromFronteie.size() && selectedChromosome.size() < population.size()) {
+				selectedChromosome.add(chromosomesFromFronteie.get(i));
+				i++;
+			}
+		}
+		return selectedChromosome;
+	}
 	
-	public static void corwdingDistanceAssignment(HashMap<Integer, ArrayList<Chromosome>> frontierMap){
+	
+	public static void crowdingDistanceAssignment(HashMap<Integer, ArrayList<Chromosome>> frontierMap){
 		Iterator it = frontierMap.entrySet().iterator();
 		while (it.hasNext()) {
 			Map.Entry pair = (Map.Entry)it.next();
@@ -28,13 +52,21 @@ public class Nsga2Operations {
 					distances.set(distances.size()-1, Double.MAX_VALUE);
 					for (int j = 1; j < distances.size()-1; j++) {
 						double nominator = getActiveObjective(i, chromosomes.get(j+1))-getActiveObjective(i, chromosomes.get(j+1));
-						double denominator = getActiveObjective(i, chromosomes.get(chromosomes.size()-1)) - getActiveObjective(i, chromosomes.get(0));
+						double fMin = getActiveObjective(i, chromosomes.get(0));
+						double fMax = getActiveObjective(i, chromosomes.get(chromosomes.size()-1));
+//						double fMin = getActiveObjective(i, frontierMap.get(1).get(0));
+//						double fMax = getActiveObjective(i, frontierMap.get(frontierMap.size()-1).get(frontierMap.get(frontierMap.size()-1).size()-1));
+						double denominator = fMax - fMin;
 						double insertValue = distances.get(j) + nominator/denominator;
 						distances.set(j, insertValue);
 					}	    							
 				}
 			}
-			
+			int index = 0;
+			for (Chromosome chr : chromosomes) {
+				chr.setFitnessValue(distances.get(index));
+				index++;
+			}
 		}
 		
 	    
@@ -62,7 +94,7 @@ public class Nsga2Operations {
 						
 						return Double.compare(chr1.getDeviationFitness(), chr2.getDeviationFitness());
 					}
-				});;
+				});
 			}
 		}
 		else if ( i == 1){
@@ -92,7 +124,7 @@ public class Nsga2Operations {
 
 
 
-	public HashMap<Integer,ArrayList<Chromosome>> fastNonDominatedSort(ArrayList<Chromosome> population){
+	public static HashMap<Integer,ArrayList<Chromosome>> fastNonDominatedSort(ArrayList<Chromosome> population){
 		HashMap<Integer,ArrayList<Chromosome>> frontiers = new HashMap<Integer,ArrayList<Chromosome>>();
 		HashMap<Chromosome,Integer> dominationCount= new HashMap<Chromosome,Integer>();
 		HashMap<Chromosome,ArrayList<Chromosome>> dominates = new HashMap<Chromosome, ArrayList<Chromosome>>();
@@ -143,7 +175,7 @@ public class Nsga2Operations {
 	}
 
 
-	private Chromosome getDominator(Chromosome c1, Chromosome c2){
+	private static Chromosome getDominator(Chromosome c1, Chromosome c2){
 		Chromosome dominator = null;
 		double[] fitnesses1 = {c1.getDeviationFitness(), c1.getEdgeFitness(), c1.getConnectivityFitness()};
 		double[] fitnesses2 = {c2.getDeviationFitness(), c2.getEdgeFitness(), c2.getConnectivityFitness()};

@@ -142,6 +142,7 @@ public class HelpMethods {
 	}
 	
 	public static ArrayList<Pixel> minimumSpanningTree2(ArrayList<Pixel> pixels){
+		boolean[] isAdded = new boolean[pixels.size()];
 		ArrayList<Pixel> pixelsMST = new ArrayList<Pixel>();
 		int pixelsRemaining = pixels.size()-1;
 		Comparator<Edge> edgeComparator = new Comparator<Edge>() {
@@ -160,33 +161,45 @@ public class HelpMethods {
 		PriorityQueue<Edge> edges = new PriorityQueue<Edge>(10, edgeComparator);
 		for (int i = 0; i < pixels.size(); i++) {
 			pixelsMST.add(null);
+			isAdded[i] = false;
 		}
 		Pixel bestPixel = pixels.get(0);
 		pixelsMST.set(bestPixel.getId(), bestPixel);
+		isAdded[bestPixel.getId()] = true;
 		long startTime = System.nanoTime();
 		while (pixelsRemaining > 0){
+			int i = 0;
 			for (Pixel neighbourPixel : bestPixel.getNeighbours()) {
 				if (pixelsMST.get(neighbourPixel.getId()) == null){
 					Edge edge = new Edge(neighbourPixel, bestPixel, neighbourPixel.getDistance(bestPixel));
+//					Edge edge = new Edge(neighbourPixel, bestPixel, neighbourPixel.getNeighbourDistances().get(i));
 					edges.add(edge);	
 				}
+				i++;
 			}
-			Edge bestEdge = edges.poll();
-			bestPixel = bestEdge.getFrom();
-			Pixel bestRetPixel = bestEdge.getTo();
-//			System.out.println("bestID: " + bestPixel.getId());
-//			System.out.println("beestRetID: " + bestRetPixel.getId());
-			pixelsMST.set(bestPixel.getId(), bestRetPixel);
-			pixelsRemaining--;
-			ArrayList<Edge> edgesToRemove = new ArrayList<Edge>();
-			for (Edge edge : edges) {
-				if (edge.getFrom().getId() == bestPixel.getId()){
-					edgesToRemove.add(edge);
+			while (true){
+				if (pixelsMST.get(edges.peek().getFrom().getId()) != null){
+					edges.poll();
+				}
+				else{
+					Edge bestEdge = edges.poll();
+					bestPixel = bestEdge.getFrom();
+					Pixel bestRetPixel = bestEdge.getTo();
+					pixelsMST.set(bestPixel.getId(), bestRetPixel);
+					pixelsRemaining--;
+					isAdded[edges.peek().getFrom().getId()] = true;
+					break;
 				}
 			}
-			for (Edge edge : edgesToRemove) {
-				edges.remove(edge);
-			}
+//			ArrayList<Edge> edgesToRemove = new ArrayList<Edge>();
+//			for (Edge edge : edges) {
+//				if (edge.getFrom().getId() == bestPixel.getId()){
+//					edgesToRemove.add(edge);
+//				}
+//			}
+//			for (Edge edge : edgesToRemove) {
+//				edges.remove(edge);
+//			}
 			
 			long endTime = System.nanoTime();
 			long duration = (endTime - startTime);

@@ -47,6 +47,7 @@ public class Chromosome {
 		this.deviationFitness = copy.deviationFitness;
 		this.edgeFitness = copy.edgeFitness;
 		this.connectivityFitness = copy.connectivityFitness;
+		this.pixels = copy.pixels;
 	}
 	
 	public static ArrayList<Chromosome> testFrontierChromosomes(){
