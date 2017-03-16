@@ -15,5 +15,8 @@ public class Variables {
 	public static double deviationWeight = 0.4;
 	public static double edgeFitnessWeight = 0.3;	
 	public static double connectivityWeight = 0.3;
+	
+	//choose randomly between the two chromosomes if not
+	public static double selectBestChromosomeRate = 0.8;
 
 }

@@ -41,7 +41,6 @@ public class Program {
 		this.pixels = HelpMethods.generatePixelList(pixels1);
 		//Refers to the pixel with id as same as the key
 		this.pixelMap = HelpMethods.generatePixelMap(pixels);
-		System.out.println(pixels.size());
 		this.image = HelpMethods.generateImage(pixels1);
 		ArrayList<Pixel> pixelsMST = HelpMethods.minimumSpanningTree2(pixels);
 //		System.out.println(new Chromosome(pixelsMST, pixels, 0).getSegments().size());
