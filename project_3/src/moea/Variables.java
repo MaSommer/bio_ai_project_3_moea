@@ -18,5 +18,12 @@ public class Variables {
 	
 	//choose randomly between the two chromosomes if not
 	public static double selectBestChromosomeRate = 0.8;
+	
+	public static double maximumDeviationValue = Math.sqrt(Math.pow(255, 2)+Math.pow(255, 2)+Math.pow(255, 2));
+	public static double minimumDeviationValue = 0;
+	public static double maximumEdgeValue;
+	public static double minimumEdgeValue;
+	public static double maximumConnectivityValue;
+	public static double minimumConnectivityValue;
 
 }

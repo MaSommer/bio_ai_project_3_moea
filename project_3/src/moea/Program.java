@@ -58,9 +58,13 @@ public class Program {
 //		System.out.println("last r: "+pixelsMST.get(size).getRed() + " g: "+pixelsMST.get(size).getGreen() + " b: " + pixelsMST.get(size).getBlue());
 		
 		
-		this.population = HelpMethods.createPopulation(pixelsMST, pSize, pixels);
+		this.population = HelpMethods.createPopulation(pixelsMST, pSize, pixels, HelpMethods.createMapPixelToIndex(pixels));
 		HelpMethods.paintEdgesGreen(population.get(0));
 		HelpMethods.drawImage(image);
+	}
+	
+	public void run(){
+		
 	}
 	
 	
