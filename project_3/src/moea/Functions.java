@@ -42,7 +42,8 @@ public class Functions {
 		rgbValues.add(blue/segment.size());
 		
 		for(Pixel p:segment){
-			deviation+=pixelDeviation(rgbValues,p)/Math.abs(Variables.maximumDeviationValue-Variables.minimumDeviationValue);
+//			deviation+=pixelDeviation(rgbValues,p)/Math.abs(Variables.maximumDeviationValue-Variables.minimumDeviationValue);
+			deviation+=pixelDeviation(rgbValues,p);
 		}
 		
 		return deviation;
@@ -61,8 +62,9 @@ public class Functions {
 		int counter = 1;
 		double connectivityValue = 0;
 		for(Pixel neighbour: p.getNeighbours()){
-			if (pixelsToSegment.get(neighbour.getId()) == segmentNr){
-				connectivityValue += (1/counter)/Math.abs(Variables.maximumConnectivityValue-Variables.minimumConnectivityValue);
+			if (pixelsToSegment.get(neighbour.getId()) != segmentNr){
+//				connectivityValue += (1/counter)/Math.abs(Variables.maximumConnectivityValue-Variables.minimumConnectivityValue);
+				connectivityValue += (1/counter);
 				counter++;				
 			}
 		}
@@ -85,7 +87,8 @@ public class Functions {
 	
 	public static double segmentEdgeValue(ArrayList<Pixel> segmentEdges, ArrayList<Pixel> segment, int segmentNr, ArrayList<Integer> pixelsToSegment){
 		double edgeValue = 0;
-		double normalizeConstant = Math.abs(Variables.maximumEdgeValue-Variables.minimumEdgeValue);
+//		double normalizeConstant = Math.abs(Variables.maximumEdgeValue-Variables.minimumEdgeValue);
+		double normalizeConstant = 1;
 		for(Pixel p: segmentEdges){
 			for(Pixel neighbour: p.getNeighbours()){
 				if (pixelsToSegment.get(neighbour.getId()) == segmentNr){
