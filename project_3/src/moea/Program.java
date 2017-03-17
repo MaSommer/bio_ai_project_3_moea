@@ -87,7 +87,7 @@ public class Program {
 		long startTime = System.nanoTime();
 		int generations = 1;
 		//do some mutations
-		for (int i = 0; i < 50; i++) {
+		for (int i = 0; i < 500; i++) {
 			for (Chromosome chromosome : population) {
 				chromosome.mutate();
 			}

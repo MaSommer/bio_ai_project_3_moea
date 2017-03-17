@@ -138,7 +138,6 @@ public class Nsga2Operations {
 					pDominationCount++;
 				}
 			}
-			System.out.println(pDominationCount);
 			dominates.put(p, pDominates);
 			dominationCount.put(p,pDominationCount);
 			if(pDominationCount==0){
@@ -146,22 +145,18 @@ public class Nsga2Operations {
 					ArrayList<Chromosome> frontier1 = new ArrayList<Chromosome>();
 					frontiers.put(1,frontier1);
 				}
-				System.out.println("Adds to frontier1");
 				frontiers.get(1).add(p);
 			}
 		}
-		System.out.println("First frontier: " + frontiers.get(1));
 		int i = 1;
 		while(frontiers.get(i).size() !=0){
 			ArrayList<Chromosome> nextFront = new ArrayList<Chromosome>();
 			ArrayList<Chromosome> currentFrontier = frontiers.get(i);
 			for(Chromosome p:currentFrontier){
-				System.out.println("Checks " + p);
 				ArrayList<Chromosome> Q = dominates.get(p);
 				for(Chromosome q:Q){
 					int domCount = 0;
 					if(getDominator(p,q).equals(p)){
-						System.out.println("Decreases");
 						domCount = dominationCount.get(q);
 						domCount-=1;
 						dominationCount.put(q, domCount);
@@ -172,7 +167,6 @@ public class Nsga2Operations {
 				}
 			}
 			i++;
-			System.out.println("nextFront: "+nextFront);
 			frontiers.put(i, nextFront);
 		}
 		return frontiers;
@@ -216,13 +210,22 @@ public class Nsga2Operations {
 
 	}
 	public static void main(String[] args) {
-		ArrayList<Chromosome> pop = Chromosome.testFrontierChromosomes();
-//		ArrayList<Chromosome> empty = new ArrayList<Chromosome>();
-		HashMap<Integer,ArrayList<Chromosome>> map = fastNonDominatedSort(pop);
+		ArrayList<Chromosome> pop = Chromosome.testCrowdChromosomes();
+		ArrayList<Chromosome> empty = new ArrayList<Chromosome>();
+		HashMap<Integer,ArrayList<Chromosome>> map = new HashMap<Integer,ArrayList<Chromosome>>();
+		map.put(1, pop);
+		map.put(2, empty);
+		crowdingDistanceAssignment(map);
+		System.out.println(map.get(1));
+		Collections.sort(pop, new Comparator<Chromosome>() {
+			public int compare(Chromosome chr1, Chromosome chr2) {
+				return -Double.compare(chr1.getFitnessValue(), chr2.getFitnessValue());
+			}
+		});
+		System.out.println(map.get(1));
 		for(int i = 1 ; i < map.size()+1; i++){
-			System.out.println(map.get(i));
 		}
-
+		
 //		Nsga2Operations.crowdingDistanceAssignment(map);
 //		ArrayList<Chromosome> toPrint = map.get(1);
 //		System.out.println(toPrint);
