@@ -139,8 +139,12 @@ public class Chromosome {
 		updateFitnessParameters();
 	}
 	
-	public void setFitnessValue(double fitnessValue){
-		this.fitnessValue = fitnessValue;
+	public void addObjectiveDistance(double distance){
+		this.fitnessValue += distance;
+	}
+	
+	public void clearFitness(){
+		this.fitnessValue = 0;
 	}
 	
 	public double getDeviationFitness() {

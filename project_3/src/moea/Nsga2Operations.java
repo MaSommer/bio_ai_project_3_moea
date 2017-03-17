@@ -15,7 +15,6 @@ public class Nsga2Operations {
 		ArrayList<Chromosome> selectedChromosome = new ArrayList<Chromosome>();
 		HashMap<Integer, ArrayList<Chromosome>> frontierMap = fastNonDominatedSort(population);
 		crowdingDistanceAssignment(frontierMap);
-		Collections.shuffle(population);
 		Iterator it = frontierMap.entrySet().iterator();
 		while(it.hasNext() && selectedChromosome.size() < population.size()){
 			Map.Entry pair = (Map.Entry)it.next();
@@ -41,39 +40,29 @@ public class Nsga2Operations {
 		while (it.hasNext()) {
 			Map.Entry pair = (Map.Entry)it.next();
 			ArrayList<Chromosome> chromosomes = (ArrayList<Chromosome>) pair.getValue();
-			ArrayList<Double> distances = new ArrayList<Double>();
 			if (chromosomes.size() == 0){
 				break;
 			}
 			for (int i = 0; i < chromosomes.size(); i++) {
-				distances.add(0.0);				
+				chromosomes.get(i).clearFitness();
 			} 
 			//for each active objective {deviation, edgevalue, connectivity}, this is specified in variables
 			for (int i = 0; i < Variables.activeObjectives.length; i++) {
 				if (Variables.activeObjectives[i]){
 					sortArrayListsInFrontierMap(i, frontierMap);
-					distances.set(0, Double.MAX_VALUE);
-					distances.set(distances.size()-1, Double.MAX_VALUE);
-					for (int j = 1; j < distances.size()-1; j++) {
+					chromosomes.get(0).addObjectiveDistance(Double.MAX_VALUE);
+					chromosomes.get(chromosomes.size()-1).addObjectiveDistance(Double.MAX_VALUE);
+					double fMin = getActiveObjective(i, chromosomes.get(0));
+					double fMax = getActiveObjective(i, chromosomes.get(chromosomes.size()-1));
+					double denominator = fMax - fMin;
+					for (int j = 1; j < chromosomes.size()-1; j++) {
 						double nominator = getActiveObjective(i, chromosomes.get(j+1))-getActiveObjective(i, chromosomes.get(j-1));
-						double fMin = getActiveObjective(i, chromosomes.get(0));
-						double fMax = getActiveObjective(i, chromosomes.get(chromosomes.size()-1));
-//						double fMin = getActiveObjective(i, frontierMap.get(1).get(0));
-//						double fMax = getActiveObjective(i, frontierMap.get(frontierMap.size()-1).get(frontierMap.get(frontierMap.size()-1).size()-1));
-						double denominator = fMax - fMin;
-						double insertValue = distances.get(j) + nominator/denominator;
-						distances.set(j, insertValue);
+						double insertValue = nominator/denominator;
+						chromosomes.get(j).addObjectiveDistance(insertValue);
 					}	    							
 				}
 			}
-			int index = 0;
-			for (Chromosome chr : chromosomes) {
-				chr.setFitnessValue(distances.get(index));
-				index++;
-			}
 		}
-		
-	    
 	}
 	
 	public static double getActiveObjective(int i, Chromosome chr){
