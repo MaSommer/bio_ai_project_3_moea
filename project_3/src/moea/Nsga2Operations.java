@@ -149,6 +149,7 @@ public class Nsga2Operations {
 					pDominationCount++;
 				}
 			}
+			System.out.println(pDominationCount);
 			dominates.put(p, pDominates);
 			dominationCount.put(p,pDominationCount);
 			if(pDominationCount==0){
@@ -156,25 +157,33 @@ public class Nsga2Operations {
 					ArrayList<Chromosome> frontier1 = new ArrayList<Chromosome>();
 					frontiers.put(1,frontier1);
 				}
+				System.out.println("Adds to frontier1");
 				frontiers.get(1).add(p);
 			}
 		}
+		System.out.println("First frontier: " + frontiers.get(1));
 		int i = 1;
 		while(frontiers.get(i).size() !=0){
 			ArrayList<Chromosome> nextFront = new ArrayList<Chromosome>();
 			ArrayList<Chromosome> currentFrontier = frontiers.get(i);
 			for(Chromosome p:currentFrontier){
+				System.out.println("Checks " + p);
 				ArrayList<Chromosome> Q = dominates.get(p);
 				for(Chromosome q:Q){
-					int domCount = dominationCount.get(q);
-					domCount-=1;
-					dominationCount.put(q, domCount);
+					int domCount = 0;
+					if(getDominator(p,q).equals(p)){
+						System.out.println("Decreases");
+						domCount = dominationCount.get(q);
+						domCount-=1;
+						dominationCount.put(q, domCount);
+					}
 					if(domCount ==0){
 						nextFront.add(q);
 					}
 				}
 			}
 			i++;
+			System.out.println("nextFront: "+nextFront);
 			frontiers.put(i, nextFront);
 		}
 		return frontiers;
@@ -194,17 +203,23 @@ public class Nsga2Operations {
 		}
 		
 		int fitness1IsBigger = 0;
+		int fitness2IsBigger = 0;
 
 		for(int i = 0 ; i < fitnesses1.length ; i++){
-			if((fitnesses1[i] > fitnesses2[i]) && Variables.activeObjectives[i]){
+			if((fitnesses1[i] >= fitnesses2[i]) && Variables.activeObjectives[i]){
 				fitness1IsBigger++;
+			}
+		}
+		for(int i = 0 ; i < fitnesses1.length ; i++){
+			if((fitnesses1[i] <= fitnesses2[i]) && Variables.activeObjectives[i]){
+				fitness2IsBigger++;
 			}
 		}
 
 		if(fitness1IsBigger == counter){
 			dominator = c2;
 		}
-		if(fitness1IsBigger == 0){
+		if(fitness2IsBigger == counter){
 			dominator = c1;
 		}
 		
@@ -212,15 +227,16 @@ public class Nsga2Operations {
 
 	}
 	public static void main(String[] args) {
-		ArrayList<Pixel> repr = new ArrayList<Pixel>();
-		ArrayList<Chromosome> pop = Chromosome.testCrowdChromosomes();
-		ArrayList<Chromosome> empty = new ArrayList<Chromosome>();
-		HashMap<Integer,ArrayList<Chromosome>> map = new HashMap<Integer, ArrayList<Chromosome>>();
-		map.put(1, pop);
-		map.put(2, empty);
-		Nsga2Operations.crowdingDistanceAssignment(map);
-		ArrayList<Chromosome> toPrint = map.get(1);
-		System.out.println(toPrint);
+		ArrayList<Chromosome> pop = Chromosome.testFrontierChromosomes();
+//		ArrayList<Chromosome> empty = new ArrayList<Chromosome>();
+		HashMap<Integer,ArrayList<Chromosome>> map = fastNonDominatedSort(pop);
+		for(int i = 1 ; i < map.size()+1; i++){
+			System.out.println(map.get(i));
+		}
+
+//		Nsga2Operations.crowdingDistanceAssignment(map);
+//		ArrayList<Chromosome> toPrint = map.get(1);
+//		System.out.println(toPrint);
 		
 	}
 

@@ -1,6 +1,7 @@
 package moea;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 
 public class Chromosome {
@@ -42,6 +43,7 @@ public class Chromosome {
 		updateFitnessParameters();
 	}
 	
+	
 	public Chromosome(Chromosome copy){
 		this.representation = (ArrayList<Pixel>) copy.representation.clone();
 		this.deviationFitness = copy.deviationFitness;
@@ -53,13 +55,14 @@ public class Chromosome {
 	public static ArrayList<Chromosome> testFrontierChromosomes(){
 		ArrayList<Pixel> repr = new ArrayList<Pixel>();
 		ArrayList<Chromosome> pop = new ArrayList<Chromosome>();
-		double[][] fitnessValues = {{3,3,3},{1,4,4}, {4,2,6}, {0,3,4}, {2,5,6}, {3,6,7}, {3,3,4}, {1,4,5}, {5,6,3}, {1,7,9} };
+		double[][] fitnessValues = {{3,3,3}, {5,2,6}, {0,3,4},{1,4,4}, {1,4,5}, {3,3,4}, {5,6,3}, {2,5,6}, {1,7,9}, {3,6,7} };
 		for(int i = 0 ; i < fitnessValues.length ; i++){
-			Chromosome chr1 = new Chromosome(repr, repr, 1);
+			Chromosome chr1 = new Chromosome(repr, repr, i+1);
 			double[] fitnesses = fitnessValues[i];
 			chr1.setConnectivityFitness(fitnesses[0]);
 			chr1.setDeviationFitness(fitnesses[1]);
 			chr1.setEdgeFitness(fitnesses[2]);
+			System.out.println(Arrays.toString(fitnesses));
 			pop.add(chr1);
 		}
 		return pop;
