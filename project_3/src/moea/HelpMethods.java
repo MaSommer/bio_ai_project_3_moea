@@ -336,36 +336,36 @@ public class HelpMethods {
 		return mapPixelToIndex;
 	}
 	
-	public static ArrayList<Chromosome> selection(ArrayList<Chromosome> population, ArrayList<Pixel> pixels){
-		long seed = System.nanoTime();
-		ArrayList<Chromosome> selectedPopulation = new ArrayList<Chromosome>();
-		selectedPopulation.add(new Chromosome(HelpMethods.findBestChromosome(population)));
-		Collections.shuffle(population, new Random(seed));	
-		
-		for (int i = 0; i < population.size()-1; i+=2) {
-			Chromosome chr1 = population.get(i);
-			Chromosome chr2 = population.get(i+1);
-			Chromosome fittest = chr2;
-			if (chr1.getFitnessValue() < chr2.getFitnessValue()){
-				fittest = chr1;
-			}
-			int random = (int)(Math.random()*2);
-			if (random < 1000*Variables.selectBestChromosomeRate){
-				selectedPopulation.add(fittest);
-			}
-			else{
-				random = (int) (Math.random()*2);
-				if (random == 0){
-					selectedPopulation.add(chr1);
-				}
-				else{
-					selectedPopulation.add(chr2);					
-				}
-			}
-		}
-//		population = selectedPopulation;
-		return selectedPopulation;
-	}
+//	public static ArrayList<Chromosome> selection(ArrayList<Chromosome> population, ArrayList<Pixel> pixels){
+//		long seed = System.nanoTime();
+//		ArrayList<Chromosome> selectedPopulation = new ArrayList<Chromosome>();
+//		selectedPopulation.add(new Chromosome(HelpMethods.findBestChromosome(population)));
+//		Collections.shuffle(population, new Random(seed));	
+//		
+//		for (int i = 0; i < population.size()-1; i+=2) {
+//			Chromosome chr1 = population.get(i);
+//			Chromosome chr2 = population.get(i+1);
+//			Chromosome fittest = chr2;
+//			if (chr1.getFitnessValue() < chr2.getFitnessValue()){
+//				fittest = chr1;
+//			}
+//			int random = (int)(Math.random()*2);
+//			if (random < 1000*Variables.selectBestChromosomeRate){
+//				selectedPopulation.add(fittest);
+//			}
+//			else{
+//				random = (int) (Math.random()*2);
+//				if (random == 0){
+//					selectedPopulation.add(chr1);
+//				}
+//				else{
+//					selectedPopulation.add(chr2);					
+//				}
+//			}
+//		}
+////		population = selectedPopulation;
+//		return selectedPopulation;
+//	}
 	
 	public static ArrayList<Chromosome> crossover(ArrayList<Chromosome> selectedPopulation, ArrayList<Pixel> pixels){
 		ArrayList<Chromosome> population = new ArrayList<Chromosome>();
@@ -417,7 +417,7 @@ public class HelpMethods {
 		Chromosome bestChr = population.get(0);
 		double bestFitness = population.get(0).getFitnessValue();
 		for (Chromosome chromosome : population) {
-			if (chromosome.getFitnessValue() < bestFitness){
+			if (chromosome.getFitnessValue() > bestFitness){
 				bestChr = chromosome;
 				bestFitness = chromosome.getFitnessValue();
 			}

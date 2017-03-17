@@ -20,7 +20,7 @@ public class Variables {
 	public static double connectivityWeight = 0;
 	
 	//{active deviation, active edgevalue, active connectivity}
-	public static boolean[] activeObjectives = {true, true, true};
+	public static boolean[] activeObjectives = {true, false, false};
 	
 	//choose randomly between the two chromosomes if not
 	public static double selectBestChromosomeRate = 0.8;

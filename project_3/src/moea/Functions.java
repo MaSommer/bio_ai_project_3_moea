@@ -42,7 +42,6 @@ public class Functions {
 		rgbValues.add(blue/segment.size());
 		
 		for(Pixel p:segment){
-//			deviation+=pixelDeviation(rgbValues,p)/Math.abs(Variables.maximumDeviationValue-Variables.minimumDeviationValue);
 			deviation+=pixelDeviation(rgbValues,p);
 		}
 		
@@ -63,7 +62,6 @@ public class Functions {
 		double connectivityValue = 0;
 		for(Pixel neighbour: p.getNeighbours()){
 			if (pixelsToSegment.get(neighbour.getId()) != segmentNr){
-//				connectivityValue += (1/counter)/Math.abs(Variables.maximumConnectivityValue-Variables.minimumConnectivityValue);
 				connectivityValue += (1/counter);
 				counter++;				
 			}
@@ -87,16 +85,11 @@ public class Functions {
 	
 	public static double segmentEdgeValue(ArrayList<Pixel> segmentEdges, ArrayList<Pixel> segment, int segmentNr, ArrayList<Integer> pixelsToSegment){
 		double edgeValue = 0;
-//		double normalizeConstant = Math.abs(Variables.maximumEdgeValue-Variables.minimumEdgeValue);
-		double normalizeConstant = 1;
 		for(Pixel p: segmentEdges){
 			for(Pixel neighbour: p.getNeighbours()){
 				if (pixelsToSegment.get(neighbour.getId()) == segmentNr){
-					edgeValue-= pixelToPixelDeviation(p, neighbour)/normalizeConstant;					
+					edgeValue-= pixelToPixelDeviation(p, neighbour);					
 				}
-//				if(!segment.contains(neighbour)){
-//					edgeValue-= pixelToPixelDeviation(p, neighbour);
-//				}
 			}
 		}
 		return edgeValue;

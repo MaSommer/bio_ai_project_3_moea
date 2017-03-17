@@ -70,7 +70,7 @@ public class Chromosome {
 	public static ArrayList<Chromosome> testCrowdChromosomes(){
 		ArrayList<Pixel> repr = new ArrayList<Pixel>();
 		ArrayList<Chromosome> pop = new ArrayList<Chromosome>();
-		double[][] fitnessValues = {{35,7,1},{10,16,22}, {45,1,39}, {1,2,9}, {6,11,30}, {27,4,15}, {80,37,4}, {15,22,49}, {3,50,73}, {21,29,60}};
+		double[][] fitnessValues = {{35,7,1},{80,37,4},{1,2,9}, {27,4,15}, {10,16,22}, {6,11,30}, {45,1,39}, {15,22,49}, {21,29,60}, {3,50,73}};
 		for(int i = 0 ; i < fitnessValues.length ; i++){
 			Chromosome chr1 = new Chromosome(repr, repr, i+1);
 			double[] fitnesses = fitnessValues[i];
@@ -98,9 +98,8 @@ public class Chromosome {
 		int segmentNr = 0;
 		segmentFitnessValues = new ArrayList<double[]>();
 		for (ArrayList<Pixel> segment : segments) {
-			double size = segment.size();
-			double deviation = Functions.segmentDeviation(segment)/size;
-			double edgeFitness = Functions.segmentEdgeValue(segmentEdges.get(segmentNr), segment, segmentNr, pixelToSegment)/size;
+			double deviation = Functions.segmentDeviation(segment);
+			double edgeFitness = Functions.segmentEdgeValue(segmentEdges.get(segmentNr), segment, segmentNr, pixelToSegment);
 			double connectivity = Functions.segmentConnectivity(segment, segmentNr, pixelToSegment);
 			double[] fitnessValues = {deviation, edgeFitness, connectivity};
 			segmentFitnessValues.add(fitnessValues);
