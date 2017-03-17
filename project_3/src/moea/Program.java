@@ -95,7 +95,7 @@ public class Program {
 		
 		
 		for (int i = 0; i < Variables.numberOfGenerations; i++) {
-			ArrayList<Chromosome> selectedPopulation = HelpMethods.selection(population, pixels);
+			ArrayList<Chromosome> selectedPopulation = Nsga2Operations.selection(population);
 			population = HelpMethods.crossover(selectedPopulation, pixels);
 			HelpMethods.mutation(population);
 			
