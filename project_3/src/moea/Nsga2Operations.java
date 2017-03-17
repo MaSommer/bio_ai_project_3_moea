@@ -50,8 +50,8 @@ public class Nsga2Operations {
 			for (int i = 0; i < Variables.activeObjectives.length; i++) {
 				if (Variables.activeObjectives[i]){
 					sortArrayListsInFrontierMap(i, frontierMap);
-					chromosomes.get(0).addObjectiveDistance(Double.MAX_VALUE);
-					chromosomes.get(chromosomes.size()-1).addObjectiveDistance(Double.MAX_VALUE);
+					chromosomes.get(0).addObjectiveDistance(Double.MAX_VALUE-2);
+					chromosomes.get(chromosomes.size()-1).addObjectiveDistance(Double.MAX_VALUE-2);
 					double fMin = getActiveObjective(i, chromosomes.get(0));
 					double fMax = getActiveObjective(i, chromosomes.get(chromosomes.size()-1));
 					double denominator = fMax - fMin;
