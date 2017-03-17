@@ -204,6 +204,18 @@ public class Nsga2Operations {
 		return dominator;
 
 	}
+	public static void main(String[] args) {
+		ArrayList<Pixel> repr = new ArrayList<Pixel>();
+		ArrayList<Chromosome> pop = Chromosome.testCrowdChromosomes();
+		ArrayList<Chromosome> empty = new ArrayList<Chromosome>();
+		HashMap<Integer,ArrayList<Chromosome>> map = new HashMap<Integer, ArrayList<Chromosome>>();
+		map.put(1, pop);
+		map.put(2, empty);
+		Nsga2Operations.crowdingDistanceAssignment(map);
+		ArrayList<Chromosome> toPrint = map.get(1);
+		System.out.println(toPrint);
+		
+	}
 
 
 }
