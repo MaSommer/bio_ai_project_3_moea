@@ -187,7 +187,7 @@ public class HelpMethods {
 					Pixel bestRetPixel = bestEdge.getTo();
 					pixelsMST.set(bestPixel.getId(), bestRetPixel);
 					pixelsRemaining--;
-					isAdded[edges.peek().getFrom().getId()] = true;
+//					isAdded[edges.peek().getFrom().getId()] = true;
 					break;
 				}
 			}

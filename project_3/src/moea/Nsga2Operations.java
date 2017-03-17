@@ -1,6 +1,7 @@
 package moea;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -41,6 +42,9 @@ public class Nsga2Operations {
 			Map.Entry pair = (Map.Entry)it.next();
 			ArrayList<Chromosome> chromosomes = (ArrayList<Chromosome>) pair.getValue();
 			ArrayList<Double> distances = new ArrayList<Double>();
+			if (chromosomes.size() == 0){
+				break;
+			}
 			for (int i = 0; i < chromosomes.size(); i++) {
 				distances.add(0.0);				
 			} 
@@ -51,7 +55,7 @@ public class Nsga2Operations {
 					distances.set(0, Double.MAX_VALUE);
 					distances.set(distances.size()-1, Double.MAX_VALUE);
 					for (int j = 1; j < distances.size()-1; j++) {
-						double nominator = getActiveObjective(i, chromosomes.get(j+1))-getActiveObjective(i, chromosomes.get(j+1));
+						double nominator = getActiveObjective(i, chromosomes.get(j+1))-getActiveObjective(i, chromosomes.get(j-1));
 						double fMin = getActiveObjective(i, chromosomes.get(0));
 						double fMax = getActiveObjective(i, chromosomes.get(chromosomes.size()-1));
 //						double fMin = getActiveObjective(i, frontierMap.get(1).get(0));
@@ -134,20 +138,23 @@ public class Nsga2Operations {
 			ArrayList<Chromosome> pDominates = new ArrayList<Chromosome>();
 			Integer pDominationCount = 0;
 			for(Chromosome q : population){
-				Chromosome dominator = getDominator(p ,q);
-				if(dominator.equals(p)){
+				if(p.equals(q)){
+					continue;
+				}
+				Chromosome dominator = getDominator(p, q);
+				if(dominator != null && dominator.equals(p)){
 					pDominates.add(q);
 				}
-				if(dominator.equals(q)){
+				if(dominator != null && dominator.equals(q)){
 					pDominationCount++;
 				}
 			}
 			dominates.put(p, pDominates);
 			dominationCount.put(p,pDominationCount);
-			
 			if(pDominationCount==0){
 				if(!frontiers.containsKey(1)){
 					ArrayList<Chromosome> frontier1 = new ArrayList<Chromosome>();
+					frontiers.put(1,frontier1);
 				}
 				frontiers.get(1).add(p);
 			}
@@ -195,12 +202,12 @@ public class Nsga2Operations {
 		}
 
 		if(fitness1IsBigger == counter){
-			return c2;
+			dominator = c2;
 		}
 		if(fitness1IsBigger == 0){
-			return c1;
+			dominator = c1;
 		}
-
+		
 		return dominator;
 
 	}
