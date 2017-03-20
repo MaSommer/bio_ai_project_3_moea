@@ -13,7 +13,8 @@ public class Program {
 	private ArrayList<Pixel> pixels;
 	private ArrayList<Chromosome> population;
 	private ArrayList<ArrayList<Pixel>> image;
-	private HashMap<Integer, Pixel> pixelMap;
+	
+	//Key: pixel id, Value: the pixels that point
 	private int pSize;
 	private String imagePath;
 	private ArrayList<Pixel> MST;
@@ -35,8 +36,6 @@ public class Program {
 		ArrayList<double[]> distances = new ArrayList<double[]>();
 		int eastBorder = image.get(0).size()-1;
 		int southBorder = image.size()-1;
-		System.out.println("Width: " + eastBorder);
-		System.out.println("Height: " + southBorder);
 		int north = 0;
 		int south = 0;
 		int east = 0 ;
@@ -58,7 +57,6 @@ public class Program {
 					dist[1] = Functions.pixelToPixelDeviation(image.get(i).get(j), image.get(i+1).get(j)); //SOUTH
 					dist[2] = Functions.pixelToPixelDeviation(image.get(i).get(j), image.get(i).get(j+1)); //EAST
 					distances.add(dist);
-					System.out.println("tar hjørne1");
 					
 				}
 				else if((i == southBorder) && (j==0)){ //SOUTH WEST corner
@@ -66,7 +64,6 @@ public class Program {
 					dist[0] = Functions.pixelToPixelDeviation(image.get(i).get(j), image.get(i-1).get(j)); //NORTH
 					dist[2] = Functions.pixelToPixelDeviation(image.get(i).get(j), image.get(i).get(j+1)); //EAST
 					distances.add(dist);
-					System.out.println("tar hjørne2");
 				}
 				
 				else if((i == 0) && (j == eastBorder)){ //NORTH EAST Corner
@@ -74,14 +71,12 @@ public class Program {
 					dist[1] = Functions.pixelToPixelDeviation(image.get(i).get(j), image.get(i+1).get(j)); //SOUTH
 					dist[3] = Functions.pixelToPixelDeviation(image.get(i).get(j), image.get(i).get(j-1));//WEST
 					distances.add(dist);
-					System.out.println("tar hjørne3");
 				}
 				else if((i == southBorder) && (j == eastBorder)){ //SOUTH EAST corner
 					double[] dist = {-1,-1,-1,-1};
 					dist[0] = Functions.pixelToPixelDeviation(image.get(i).get(j), image.get(i-1).get(j)); //NORTH
 					dist[3] = Functions.pixelToPixelDeviation(image.get(i).get(j), image.get(i).get(j-1));//WEST
 					distances.add(dist);
-					System.out.println("tar hjørne4");
 					
 				}
 				else if(i == 0){ //NORTH BORDER
@@ -212,37 +207,13 @@ public class Program {
 		Pixel[][] pixels1 = HelpMethods.createImagePixelByPixel(imagePath);
 		this.pixels = HelpMethods.generatePixelList(pixels1);
 		//Refers to the pixel with id as same as the key
-		this.pixelMap = HelpMethods.generatePixelMap(pixels);
 		this.image = HelpMethods.generateImage(pixels1);
-
 		setDistances();
 		createMST();
 
-//		for (int i = 0; i < pixelsMST.size(); i++) {
-//			if (!pixelsMST.get(i).equals(pixelsMST1.get(i))){
-//				throw new IllegalArgumentException("kukeri");
-//			}
-//		}
-//		System.exit(0);
-//		ArrayList<Pixel> pixelsMST = HelpMethods.minimumSpanningTree2(pixels);
-//		FileAdministrator fa = new FileAdministrator("Test image1");
-//		System.exit(0);
-//		System.out.println(new Chromosome(pixelsMST, pixels, 0).getSegments().size());
-//		int size = pixelsMST.size()-1;
-//		int count = 0;
-//		for (int i = 0; i < pixelsMST.size(); i++) {
-//			Pixel p1 = pixelsMST.get(i);
-//			Pixel p2 = pixels.get(i);
-//			if (p1.getRed() != p2.getRed()){
-//				count++;
-//			}
-//		}
-//		System.out.println(count);
-//		System.out.println("frst r: "+pixelsMST.get(0).getRed() + " g: "+pixelsMST.get(0).getGreen() + " b: " + pixelsMST.get(0).getBlue());
-//		System.out.println("last r: "+pixelsMST.get(size).getRed() + " g: "+pixelsMST.get(size).getGreen() + " b: " + pixelsMST.get(size).getBlue());
-		
-
-		this.population = HelpMethods.createPopulation(this.MST, pSize, pixels, HelpMethods.createMapPixelToIndex(pixels));
+		this.population = HelpMethods.createPopulationImproved(MST, pSize, pixels);
+//		HelpMethods.paintEdgesGreen(population.get(100));
+//		HelpMethods.drawImage(image);
 	}
 	
 	public void run(){

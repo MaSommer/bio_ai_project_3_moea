@@ -20,7 +20,7 @@ public class Variables {
 	public static double connectivityWeight = 0;
 	
 	//{active deviation, active edgevalue, active connectivity}
-	public static boolean[] activeObjectives = {true, false, false};
+	public static boolean[] activeObjectives = {true, true, true};
 	
 	//choose randomly between the two chromosomes if not
 	public static double selectBestChromosomeRate = 0.8;
@@ -33,8 +33,10 @@ public class Variables {
 	public static double maximumConnectivityValue = (1 + 1/2 + 1/3 + 1/4);
 	public static double minimumConnectivityValue = 0;
 	
-	public static int numberOfGenerations = 300;
+	public static int numberOfGenerations = 50;
 
 	//Crossover variable
 	public static double mixingRate = 0.5;
+	
+	public static int minimumSegmentSize = 150;
 }

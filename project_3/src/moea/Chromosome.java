@@ -62,7 +62,7 @@ public class Chromosome {
 	public static ArrayList<Chromosome> testFrontierChromosomes(){
 		ArrayList<Pixel> repr = new ArrayList<Pixel>();
 		ArrayList<Chromosome> pop = new ArrayList<Chromosome>();
-		double[][] fitnessValues = {{3,3,3}, {5,2,6}, {0,3,4},{1,4,4}, {1,4,5}, {3,3,4}, {5,6,3}, {2,5,6}, {1,7,9}, {3,6,7} };
+		double[][] fitnessValues = {{3,3,3}, {5,2,6}, {0,3,4},{1,4,4}, {1,4,5}, {3,3,4}, {5,6,3}, {2,5,6}, {1,7,9}, {3,6,7}};
 		for(int i = 0 ; i < fitnessValues.length ; i++){
 			Chromosome chr1 = new Chromosome(repr, repr, i+1);
 			double[] fitnesses = fitnessValues[i];
