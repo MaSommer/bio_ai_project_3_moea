@@ -5,11 +5,13 @@ import java.awt.image.DataBufferByte;
 import java.io.IOException;
 import java.io.ObjectInputStream.GetField;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Map;
 import java.util.PriorityQueue;
 import java.util.Random;
 
@@ -174,8 +176,8 @@ public class HelpMethods {
 					Edge edge = new Edge(neighbourPixel, bestPixel, neighbourPixel.getDistance(bestPixel));
 //					Edge edge = new Edge(neighbourPixel, bestPixel, neighbourPixel.getNeighbourDistances().get(i));
 					edges.add(edge);	
+					i++;
 				}
-				i++;
 			}
 			while (true){
 				if (pixelsMST.get(edges.peek().getFrom().getId()) != null){
@@ -191,15 +193,6 @@ public class HelpMethods {
 					break;
 				}
 			}
-//			ArrayList<Edge> edgesToRemove = new ArrayList<Edge>();
-//			for (Edge edge : edges) {
-//				if (edge.getFrom().getId() == bestPixel.getId()){
-//					edgesToRemove.add(edge);
-//				}
-//			}
-//			for (Edge edge : edgesToRemove) {
-//				edges.remove(edge);
-//			}
 			
 			long endTime = System.nanoTime();
 			long duration = (endTime - startTime);
@@ -216,8 +209,6 @@ public class HelpMethods {
 		return pixelsMST;
 	}
 	
-
-	
 	public static HashMap<Integer, Pixel> generatePixelMap(ArrayList<Pixel> pixels){
 		HashMap<Integer, Pixel> pixelMap = new HashMap<Integer, Pixel>();
 		for (int i = 0; i < pixels.size(); i++) {
@@ -226,32 +217,37 @@ public class HelpMethods {
 		return pixelMap;
 	}
 	
-	public static ArrayList<Chromosome> createPopulation(ArrayList<Pixel> pixelsMST, int populationSize, ArrayList<Pixel> pixels, HashMap<Pixel, ArrayList<Integer>> mapPixelToIndex){
+	public static ArrayList<Chromosome> createPopulationImproved(ArrayList<Pixel> pixelsMST, int populationSize, ArrayList<Pixel> pixels){
 		ArrayList<Chromosome> population = new ArrayList<Chromosome>();
-		ArrayList<Edge> edges = generateEdges(pixelsMST, pixels, mapPixelToIndex);
-		for (int i = 0; i < populationSize; i++) {
+		ArrayList<Pixel> cuttedChromosome = (ArrayList<Pixel>) pixelsMST.clone();
+		HashMap<Pixel, ArrayList<Integer>> mapPixelsThatPointsOnPixel = createMapPixelToIndex((ArrayList<Pixel>) pixelsMST.clone());
+		int pixelIdToCut = cutIntoTwoSegments(pixelsMST, pixels, mapPixelsThatPointsOnPixel, pixels);
+		for (int i = 0; i < populationSize+20; i++) {
 			long startTime = System.nanoTime();
-			ArrayList<Pixel> cuttedChromosome = cutIntoSegments(i+1, pixelsMST, (ArrayList<Edge>) edges.clone(), pixels);
-			population.add(new Chromosome(cuttedChromosome, pixels, i+1));
-//			if(population.size() >0){
-//				ArrayList<ArrayList<Pixel>> segments = population.get(0).getSegments();
-//				double red = 0 ;
-//				double green = 0;
-//				double blue = 0;
-//				int counter = 0;
-//				for(ArrayList<Pixel> segment : segments){
-//					for(Pixel p:segment){
-//						red+=p.getRed();
-//						green+=p.getGreen();
-//						blue+=p.getBlue();
-//					}
-//					counter++;
-//					red = red/segment.size();
-//					green = green/segment.size();
-//					blue = blue/segment.size();
-//					System.out.println("Segment "+counter+ "\tsize: " +segment.size() + "\tAvg red: " +red + "\tAvg green: "+green+ "\tAvg blue: "+blue );
-//				}
-//			}
+			
+			cuttedChromosome.set(pixelIdToCut, pixels.get(pixelIdToCut));
+			Chromosome chr = new Chromosome((ArrayList<Pixel>) cuttedChromosome.clone(), pixels, i+1);
+			
+			//finds the biggest segment after the cut
+			ArrayList<ArrayList<Pixel>> segments = chr.getSegments();
+			int maxSegmentIndex = -1;
+			int maxSegmentSize = Integer.MIN_VALUE;
+			for (int j = 0; j < segments.size(); j++) {
+				if (segments.get(j).size() > maxSegmentSize){
+					maxSegmentSize = segments.get(j).size();
+					maxSegmentIndex = j;
+				}
+			}
+			ArrayList<Pixel> segment = segments.get(maxSegmentIndex);
+			
+			if (i > 20){
+				population.add(chr);				
+			}
+			mapPixelsThatPointsOnPixel = createMapPixelToIndex((ArrayList<Pixel>) cuttedChromosome.clone());
+			
+			//cut the next biggest segment
+			pixelIdToCut = cutIntoTwoSegments((ArrayList<Pixel>) cuttedChromosome.clone(), pixels, mapPixelsThatPointsOnPixel, segment);
+
 			long endTime = System.nanoTime();
 			long duration = endTime - startTime;
 			System.out.println("Total duration: " + duration/Math.pow(10, 9) + " sec");
@@ -259,44 +255,87 @@ public class HelpMethods {
 		return population;
 	}
 	
-	public static ArrayList<Pixel> cutIntoSegments(int numberOfSegments, ArrayList<Pixel> pixelsMST, ArrayList<Edge> edges, ArrayList<Pixel> pixels){
-		ArrayList<Pixel> cuttedPixels = (ArrayList<Pixel>) pixelsMST.clone();
-		for (int i = 0; i < numberOfSegments; i++) {
-			Edge maxEdge = Collections.max(edges, new Comparator<Edge>() {
-				public int compare(Edge e1, Edge e2) {
-					if (e1.getWeight() > e2.getWeight())
-						return 1;
-					else if (e1.getWeight() < e2.getWeight())
-						return -1;
-					return 0;
-				}
-			});
-			Pixel pixel = maxEdge.getFrom();
-			cuttedPixels.set(maxEdge.getFrom().getId(), pixels.get(maxEdge.getFrom().getId()));
-			edges.remove(maxEdge);
-			edges.add(new Edge(pixel, pixel, 0));
+	//Returns the pixel id that should point to itself instead. This will be the cut.
+	public static int cutIntoTwoSegments(ArrayList<Pixel> representation, ArrayList<Pixel> pixels, HashMap<Pixel, ArrayList<Integer>> mapPixelsThatPointsOnPixel, ArrayList<Pixel> segment){
+		ArrayList<Edge> edges = generateEdgesWithMap(representation, segment, pixels, mapPixelsThatPointsOnPixel);
+		int originalSegmentSize = segment.size();
+//		for (Edge edge : edges) {
+//			edge.setFakeWeight(edge.getWeight());			
+//		}
+		int[] segmentSizes;
+		Collections.sort(edges, new Comparator<Edge>() {
+			public int compare(Edge e1, Edge e2) {
+				if (e1.getWeight() < e2.getWeight())
+					return 1;
+				else if (e1.getWeight() > e2.getWeight())
+					return -1;
+				return 0;
+			}
+		});
+		int index = 0;
+		Edge maxEdge = null;
+		while (true){
+			maxEdge = edges.get(index);
+			segmentSizes = setSegmentSizeForEachPixel(maxEdge, mapPixelsThatPointsOnPixel, pixels, originalSegmentSize);
+			if (segmentSizes[0] < Variables.minimumSegmentSize || segmentSizes[1] < Variables.minimumSegmentSize){
+				index++;
+				continue;
+			}
+			System.out.println("Seg sizez: " + Arrays.toString(segmentSizes));
+			break;
 		}
-		return cuttedPixels;
+		return maxEdge.getFrom().getId();
 	}
 	
-	public static ArrayList<Edge> generateEdges(ArrayList<Pixel> pixelsMST, ArrayList<Pixel> pixels, HashMap<Pixel, ArrayList<Integer>> mapPixelToIndex){
+	public static ArrayList<Edge> generateEdgesWithMap(ArrayList<Pixel> pixelsMST, ArrayList<Pixel> segment, ArrayList<Pixel> pixels, HashMap<Pixel, ArrayList<Integer>> mapPixelToIndex){
 		ArrayList<Edge> edgeList = new ArrayList<Edge>();
-		for (int i = 0; i < pixelsMST.size(); i++) {
-			Pixel p = pixels.get(i);
-			double cost = p.getDistance(pixelsMST.get(i));
+		for (int i = 0; i < segment.size(); i++) {
+			Pixel p = segment.get(i);
+			double cost = p.getDistance(pixelsMST.get(p.getId()));
 			double minCost = cost;
-			for (Integer index : mapPixelToIndex.get(p)) {
-				double weight = pixels.get(index).getDistance(p);
-				if (weight < minCost){
-					minCost += weight;
+			if (mapPixelToIndex.get(p) != null){
+				for (Integer index : mapPixelToIndex.get(p)) {
+					double weight = pixels.get(index).getDistance(p);
+					if (weight < minCost){
+						minCost += weight;
+					}				
 				}				
 			}
 			//dividing on minCost for normalizing to avoid choosing edge which gives a segment with few pixels and another with a lot pixels. 
 			
-			Edge edge = new Edge(pixels.get(i), pixelsMST.get(i), cost/(minCost+0.00000000001));
+			Edge edge = new Edge(segment.get(i), pixelsMST.get(i), cost/(minCost+0.00000000001));
 			edgeList.add(edge);
 		}
+		
 		return edgeList;
+	}
+	
+	public static int[] setSegmentSizeForEachPixel(Edge edge, HashMap<Pixel, ArrayList<Integer>> mapPixelsThatPointsOnPixel, ArrayList<Pixel> pixels, int originalSegmentSize){
+		int segmentSizeFrom = 0;
+		int segmentSizeTo = 0;
+		int fromPixelId = edge.getFrom().getId();
+		ArrayList<Integer> pointsToFromPixel = mapPixelsThatPointsOnPixel.get(pixels.get(fromPixelId));
+		
+		segmentSizeFrom = recursiveSegmentSizeCounter(fromPixelId, pointsToFromPixel, segmentSizeFrom, mapPixelsThatPointsOnPixel, pixels);
+		segmentSizeTo = originalSegmentSize - segmentSizeFrom;
+		
+		int[] ret = {segmentSizeFrom, segmentSizeTo};
+		return ret;
+	}
+	
+	public static int recursiveSegmentSizeCounter(int pixelId, ArrayList<Integer> pixelsList, int counter, HashMap<Pixel, ArrayList<Integer>> mapPixelsThatPointsOnPixel, ArrayList<Pixel> pixels){
+		counter++;
+		if (pixelsList == null){
+			return counter;
+		}
+		for (Integer integer : pixelsList) {
+			if (pixelId == integer){
+				continue;
+			}
+			ArrayList<Integer> newPixelsList = mapPixelsThatPointsOnPixel.get(pixels.get(integer));
+			counter = recursiveSegmentSizeCounter(integer, newPixelsList, counter, mapPixelsThatPointsOnPixel, pixels);
+		}
+		return counter;
 	}
 	
 	public static void mergeArrayList(ArrayList<Pixel> a1, ArrayList<Pixel> a2){
@@ -322,6 +361,7 @@ public class HelpMethods {
 		return segmentEdges;
 	}
 	
+	//Key: Pixel, Value: A list of the pixels ids that points to the key in the MST
 	public static HashMap<Pixel, ArrayList<Integer>> createMapPixelToIndex(ArrayList<Pixel> representation){
 		HashMap<Pixel, ArrayList<Integer>> mapPixelToIndex = new HashMap<Pixel, ArrayList<Integer>>();
 		for (int i = 0; i < representation.size(); i++) {
@@ -337,6 +377,7 @@ public class HelpMethods {
 		}
 		return mapPixelToIndex;
 	}
+	
 	
 //	public static ArrayList<Chromosome> selection(ArrayList<Chromosome> population, ArrayList<Pixel> pixels){
 //		long seed = System.nanoTime();
@@ -435,6 +476,7 @@ public class HelpMethods {
 			}
 		}
 	}
+	
 	
 	public static void nonDominatedSort(ArrayList<Chromosome> population){
 //		ArrayList<Chromosome> 

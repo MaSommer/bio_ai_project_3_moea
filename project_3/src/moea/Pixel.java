@@ -33,20 +33,6 @@ public class Pixel {
 		return ""+id;
 	}
 	
-//	public Pixel(Pixel another){
-//		this.red = another.red;
-//		this.green = another.green;
-//		this.blue = another.blue;
-//		this.alpha = another.alpha;
-//		this.id = another.id;
-//		this.hasAlphaChannel = another.hasAlphaChannel;
-//		this.neighbours = new ArrayList<Pixel>();
-//		for (Pixel neigh : another.neighbours) {
-//			this.neighbours.add(new Pixel(neigh));
-//		}
-//		this.neighbourDistances = another.neighbourDistances;
-//	}
-	
 	public int getRed() {
 		return red;
 	}
