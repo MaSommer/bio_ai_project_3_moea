@@ -88,6 +88,12 @@ public class Pixel {
 		this.blue = 4;
 	}
 	
+	public void setColor(int[] rgb){
+		this.red = rgb[0];
+		this.green = rgb[1];
+		this.blue = rgb[2];
+	}
+	
 //	public String toString(){
 //		int number = this.id+1;
 //		return ""+number;

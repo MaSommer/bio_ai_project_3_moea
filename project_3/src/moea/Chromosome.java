@@ -47,6 +47,10 @@ public class Chromosome {
 		this.fitnessValue += distance;
 	}
 	
+	public void updateSegmentBorder() {
+		this.segmentEdges = HelpMethods.generateSegmentEdges(segments, pixelToSegment);
+	}
+	
 	public void clearFitness(){
 		this.fitnessValue = 0;
 	}
@@ -240,8 +244,45 @@ public class Chromosome {
 		long endTime = System.nanoTime();
 		long duration = (endTime - startTime);
 //		System.out.println("decodeChromosome: "+ duration/Math.pow(10, 9) + " sec");
+		
 		this.segments = decodedChromosome;
 	}
+	
+	public void removeSmallSegments( int minSize){
+		for(ArrayList<Pixel> segment: this.segments){
+			if(segment.size() < minSize){
+				for(Pixel p:segment){
+					ArrayList<Pixel> borderPixels = new ArrayList<Pixel>();
+					for(Pixel n:p.getNeighbours()){
+						if(!segment.contains(n)){
+							borderPixels.add(n);
+						}
+					}
+					if(borderPixels.size() == 0){
+						continue;
+					}
+					else{
+						double minDistance = 10000;
+						Pixel minPointer = null;
+						for(Pixel b:borderPixels){
+							double dist = p.getDistance(b);
+							if(dist<minDistance){
+								minDistance = dist;
+								minPointer = b;
+							}
+						}
+						this.representation.set(p.getId(), minPointer);
+						break;
+					}	
+				}
+			}
+		}
+		System.out.println("Number of segments: " + segments.size());
+		decodeChromosome(pixels);
+		
+	}
+
+
 	
 	public String toString(){
 		return "" + id;
