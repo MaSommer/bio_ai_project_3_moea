@@ -5,6 +5,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.PriorityQueue;
@@ -22,6 +23,27 @@ public class Program {
 	private String imagePath;
 	private ArrayList<Pixel> MST;
 	private ArrayList<double[]> distances;
+	public static int[][] colors = {	{246, 14, 14, 180},
+										{246, 169, 14, 180},
+										{246, 246, 14, 180},
+										{114, 246, 14, 180},
+										{14, 246, 184, 180},
+										{14, 200, 246, 180},
+										{14, 107, 246, 180},
+										{14, 107, 246, 180},
+										{14, 21, 246, 180},
+										{200, 14, 246, 180},
+										{246, 14, 184, 180},
+										{246, 14, 99, 180},
+										{246, 14, 14, 180},
+										{0, 0, 0, 180},
+										{131, 119, 119, 180},
+										{220, 129, 129, 180},
+										{229, 204, 255, 180},
+										{0, 153, 0, 180},
+										{153, 0, 76, 180}       };
+	
+	
 	
 	
 	
@@ -37,7 +59,96 @@ public class Program {
 		this.pixels = new ArrayList<Pixel>();
 		this.imagePath = imagePath;
 
-	} 
+	}
+	
+	public double calculateNeuronDistance(double[] values, Pixel p){
+		double redDist = Math.pow(p.getRed()-values[0], 2);
+		double greenDist = Math.pow(p.getGreen()-values[1], 2);
+		double blueDist = Math.pow(p.getBlue()-values[2], 2);
+		return Math.pow(redDist+blueDist+greenDist, 0.5);
+	}
+	
+	public ArrayList<ArrayList<Pixel>> paintWithKmeans(int segments){
+		double[][] neurons = new double[segments][3];
+		double red = 0;
+		double blue = 0;
+		double green = 0;
+		for(Pixel p: pixels){
+			red+= p.getRed();
+			blue+=p.getBlue();
+			green+=p.getGreen();
+		}
+		red=red/pixels.size();
+		green = green/pixels.size();
+		blue = blue/pixels.size();
+		
+		for(double[] values:neurons){
+			values[0] = red;
+			values[1] = green;
+			values[2] =blue;
+		}
+		
+		for(Pixel p: pixels){
+			double minDist = 1000000;
+			int index = -1;
+			for(int i = 0; i < neurons.length ; i++){
+				if(calculateNeuronDistance(neurons[i] , p) <= minDist){
+					index = i;
+					minDist = calculateNeuronDistance(neurons[i] , p);
+					
+				}
+			}
+			neurons[index][0] += 0.5*(p.getRed() - neurons[index][0]);
+			neurons[index][1] += 0.5*(p.getGreen() - neurons[index][1]);
+			neurons[index][2] += 0.5*(p.getBlue() - neurons[index][2]);
+			
+		}
+		ArrayList<ArrayList<Pixel>> segmentedPixels = new ArrayList<ArrayList<Pixel>>();
+		for(int i = 0 ; i < neurons.length ; i++){
+			segmentedPixels.add(new ArrayList<Pixel>());
+		}
+		for(Pixel p:pixels){
+			double minDist = 100000;
+			int index = -1;
+			for(int i = 0 ; i < neurons.length ; i++){
+				if(calculateNeuronDistance(neurons[i], p) <= minDist){
+					index = i;
+					minDist = calculateNeuronDistance(neurons[i], p);
+				}
+			}
+			segmentedPixels.get(index).add(p);
+		}
+		for(double[] neuron:neurons){
+			System.out.println(Arrays.toString(neuron));
+		}
+		return segmentedPixels;
+			
+	}
+	
+	public Chromosome encode(ArrayList<ArrayList<Pixel>> segmentedPixels, int maxSegments, int maxSegmentSize){
+		ArrayList<Pixel> workingCopy = (ArrayList<Pixel>) MST.clone();
+		for(ArrayList<Pixel> segment: segmentedPixels){
+			for(Pixel p: segment){
+				Pixel pointsTo = MST.get(p.getId());
+				if(!segment.contains(pointsTo)){
+					workingCopy.set(p.getId(), p);
+				}
+			}
+			
+		}
+		Chromosome individual = new Chromosome(workingCopy, pixels, 10);
+		int counter = 0;
+		while(individual.getSegments().size() > maxSegments){
+			individual.removeSmallSegments(maxSegmentSize);
+			counter ++;
+			if(counter == 100){
+				break;
+			}
+		}
+		individual.updateChromosome();
+		return individual;
+	}
+
 	
 	public void setDistances() {
 		ArrayList<double[]> distances = new ArrayList<double[]>();
@@ -224,45 +335,10 @@ public class Program {
 		this.image = HelpMethods.generateImage(pixels1);
 		setDistances();
 		createMST();
-//
-//		
-//		BufferedReader br = new BufferedReader(new FileReader("palme.txt"));	
-//		ArrayList<Pixel> pixelsMST1 = new ArrayList<Pixel>();
-//		String line = "";
-//		line = br.readLine();
-//		System.out.println(line);
-//		while((line = br.readLine()) != null){
-//			pixelsMST1.add(pixels.get(Integer.parseInt(line)));
-//			System.out.println("cock");
-//		}
-//		br.close();
-		
-//		ArrayList<Pixel> pixelsMST1 = fa.readMST(pixels, "palme.txt");
-//		ArrayList<Pixel> pixelsMST = HelpMethods.minimumSpanningTree2(pixels);
-//		for (int i = 0; i < pixelsMST.size(); i++) {
-//			if (!pixelsMST.get(i).equals(pixelsMST1.get(i))){
-//				throw new IllegalArgumentException("kukeri");
-//			}
-//		}
-//		System.exit(0);
-//		ArrayList<Pixel> pixelsMST = HelpMethods.minimumSpanningTree2(pixels);
-//		FileAdministrator fa = new FileAdministrator("Test image1");
-//		System.exit(0);
-//		System.out.println(new Chromosome(pixelsMST, pixels, 0).getSegments().size());
-//		int size = pixelsMST.size()-1;
-//		int count = 0;
-//		for (int i = 0; i < pixelsMST.size(); i++) {
-//			Pixel p1 = pixelsMST.get(i);
-//			Pixel p2 = pixels.get(i);
-//			if (p1.getRed() != p2.getRed()){
-//				count++;
-//			}
-//		}
-//		System.out.println(count);
-//		System.out.println("frst r: "+pixelsMST.get(0).getRed() + " g: "+pixelsMST.get(0).getGreen() + " b: " + pixelsMST.get(0).getBlue());
-//		System.out.println("last r: "+pixelsMST.get(size).getRed() + " g: "+pixelsMST.get(size).getGreen() + " b: " + pixelsMST.get(size).getBlue());
-		
-		
+//		ArrayList<ArrayList<Pixel>> test = paintWithKmeans(10);
+//		Chromosome chr = encode(test);
+//		this.population = new ArrayList<Chromosome>();
+//		this.population.add(chr);
 		this.population = HelpMethods.createPopulation(this.MST, pSize, pixels, HelpMethods.createMapPixelToIndex(pixels));
 	}
 	
@@ -270,7 +346,7 @@ public class Program {
 		long startTime = System.nanoTime();
 		int generations = 1;
 		//do some mutations
-		for (int i = 0; i < 200; i++) {
+		for (int i = 0; i < 1000; i++) {
 			for (Chromosome chromosome : population) {
 				chromosome.mutate();
 			}
@@ -293,13 +369,33 @@ public class Program {
 		HelpMethods.drawImage(image);
 	}
 	
+	public ArrayList<ArrayList<Pixel>> getImage() {
+		return this.image;
+	}
+	
+	public ArrayList<Chromosome> getPopulation(){
+		return this.population;
+	}
+	
 	
 	
 	public static void main(String[] args) throws IOException {
 		String imagePath = "Test Image/1/Test Image.jpg";
 		Program p = new Program(imagePath);
 		p.init();
-		p.run();
+
+		p.getPopulation().get(0).updateSegmentBorder();
+		HelpMethods.paintEdgesGreen(p.getPopulation().get(0));
+		HelpMethods.drawImage(p.getImage());
+
+//		HelpMethods.paintEdgesGreen(p.getPopulation().get(0));
+//		HelpMethods.drawImage(p.getImage());
+//		p.paintWithKmeans(10);
+//		HelpMethods.drawImage(p.getImage());
+//		p.createMST();
+		
+//		
+//		p.run();
 	}
 
 }
