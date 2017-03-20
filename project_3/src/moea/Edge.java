@@ -24,5 +24,9 @@ public class Edge {
 		return weight;
 	}
 	
+	public String toString(){
+		return "From: " +from.toString() + " to " + to.toString();
+	}
+	
 	
 }

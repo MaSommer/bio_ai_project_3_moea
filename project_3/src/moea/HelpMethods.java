@@ -216,6 +216,8 @@ public class HelpMethods {
 		return pixelsMST;
 	}
 	
+
+	
 	public static HashMap<Integer, Pixel> generatePixelMap(ArrayList<Pixel> pixels){
 		HashMap<Integer, Pixel> pixelMap = new HashMap<Integer, Pixel>();
 		for (int i = 0; i < pixels.size(); i++) {

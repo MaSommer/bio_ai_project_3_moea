@@ -29,6 +29,10 @@ public class Pixel {
 		neighbourDistances = new ArrayList<Double>();
 	}
 	
+	public String toString(){
+		return ""+id;
+	}
+	
 //	public Pixel(Pixel another){
 //		this.red = another.red;
 //		this.green = another.green;

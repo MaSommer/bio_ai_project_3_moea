@@ -33,7 +33,7 @@ public class Variables {
 	public static double maximumConnectivityValue = (1 + 1/2 + 1/3 + 1/4);
 	public static double minimumConnectivityValue = 0;
 	
-	public static int numberOfGenerations = 100;
+	public static int numberOfGenerations = 300;
 
 	//Crossover variable
 	public static double mixingRate = 0.5;
