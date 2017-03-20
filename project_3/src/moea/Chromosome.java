@@ -43,6 +43,13 @@ public class Chromosome {
 		updateFitnessParameters();
 	}
 	
+	public void addObjectiveDistance(double distance){
+		this.fitnessValue += distance;
+	}
+	
+	public void clearFitness(){
+		this.fitnessValue = 0;
+	}
 	
 	public Chromosome(Chromosome copy){
 		this.representation = (ArrayList<Pixel>) copy.representation.clone();
@@ -138,13 +145,6 @@ public class Chromosome {
 		updateFitnessParameters();
 	}
 	
-	public void addObjectiveDistance(double distance){
-		this.fitnessValue += distance;
-	}
-	
-	public void clearFitness(){
-		this.fitnessValue = 0;
-	}
 	
 	public double getDeviationFitness() {
 		return deviationFitness;

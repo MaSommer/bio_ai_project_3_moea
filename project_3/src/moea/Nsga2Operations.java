@@ -209,28 +209,28 @@ public class Nsga2Operations {
 		return dominator;
 
 	}
-	public static void main(String[] args) {
-		ArrayList<Chromosome> pop = Chromosome.testCrowdChromosomes();
-		ArrayList<Chromosome> empty = new ArrayList<Chromosome>();
-		HashMap<Integer,ArrayList<Chromosome>> map = new HashMap<Integer,ArrayList<Chromosome>>();
-		map.put(1, pop);
-		map.put(2, empty);
-		crowdingDistanceAssignment(map);
-		System.out.println(map.get(1));
-		Collections.sort(pop, new Comparator<Chromosome>() {
-			public int compare(Chromosome chr1, Chromosome chr2) {
-				return -Double.compare(chr1.getFitnessValue(), chr2.getFitnessValue());
-			}
-		});
-		System.out.println(map.get(1));
-		for(int i = 1 ; i < map.size()+1; i++){
-		}
+//	public static void main(String[] args) {
+//		ArrayList<Chromosome> pop = Chromosome.testCrowdChromosomes();
+//		ArrayList<Chromosome> empty = new ArrayList<Chromosome>();
+//		HashMap<Integer,ArrayList<Chromosome>> map = new HashMap<Integer,ArrayList<Chromosome>>();
+//		map.put(1, pop);
+//		map.put(2, empty);
+//		crowdingDistanceAssignment(map);
+//		System.out.println(map.get(1));
+//		Collections.sort(pop, new Comparator<Chromosome>() {
+//			public int compare(Chromosome chr1, Chromosome chr2) {
+//				return -Double.compare(chr1.getFitnessValue(), chr2.getFitnessValue());
+//			}
+//		});
+//		System.out.println(map.get(1));
+//		for(int i = 1 ; i < map.size()+1; i++){
+//		}
 		
 //		Nsga2Operations.crowdingDistanceAssignment(map);
 //		ArrayList<Chromosome> toPrint = map.get(1);
 //		System.out.println(toPrint);
-		
-	}
+//		
+//	}
 
 
 }
