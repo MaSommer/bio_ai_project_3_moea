@@ -12,10 +12,6 @@ public class Program {
 	private ArrayList<Chromosome> population;
 	private ArrayList<ArrayList<Pixel>> image;
 	private HashMap<Integer, Pixel> pixelMap;
-	private int maxSegments;
-	private int minPixelsInSegment;
-	private double mRate;
-	private int elitesToNextGen;
 	private int pSize;
 	private String imagePath;
 	
@@ -24,10 +20,6 @@ public class Program {
 	
 	public Program(String imagePath) {
 		super();
-		this.maxSegments = Variables.maxSegments;
-		this.minPixelsInSegment = Variables.minPixelsInSegment;
-		this.mRate = Variables.mRate;
-		this.elitesToNextGen = Variables.elitesToNextGen;
 		this.pSize = Variables.pSize;
 		this.image = new ArrayList<ArrayList<Pixel>>();
 		this.pixels = new ArrayList<Pixel>();
@@ -41,6 +33,8 @@ public class Program {
 		//Refers to the pixel with id as same as the key
 		this.pixelMap = HelpMethods.generatePixelMap(pixels);
 		this.image = HelpMethods.generateImage(pixels1);
+		ArrayList<Pixel> pixelsMST = HelpMethods.minimumSpanningTree2(pixels);
+		this.population = HelpMethods.createPopulation(pixelsMST, pSize, pixels, HelpMethods.createMapPixelToIndex(pixels));
 //
 //		
 //		BufferedReader br = new BufferedReader(new FileReader("palme.txt"));	
@@ -55,7 +49,6 @@ public class Program {
 //		br.close();
 		
 //		ArrayList<Pixel> pixelsMST1 = fa.readMST(pixels, "palme.txt");
-		ArrayList<Pixel> pixelsMST = HelpMethods.minimumSpanningTree2(pixels);
 //		for (int i = 0; i < pixelsMST.size(); i++) {
 //			if (!pixelsMST.get(i).equals(pixelsMST1.get(i))){
 //				throw new IllegalArgumentException("kukeri");
@@ -80,7 +73,6 @@ public class Program {
 //		System.out.println("last r: "+pixelsMST.get(size).getRed() + " g: "+pixelsMST.get(size).getGreen() + " b: " + pixelsMST.get(size).getBlue());
 		
 		
-		this.population = HelpMethods.createPopulation(pixelsMST, pSize, pixels, HelpMethods.createMapPixelToIndex(pixels));
 	}
 	
 	public void run(){
@@ -92,8 +84,6 @@ public class Program {
 				chromosome.mutate();
 			}
 		}
-		
-		
 		for (int i = 0; i < Variables.numberOfGenerations; i++) {
 			ArrayList<Chromosome> selectedPopulation = Nsga2Operations.selection(population);
 			population = HelpMethods.crossover(selectedPopulation, pixels);
