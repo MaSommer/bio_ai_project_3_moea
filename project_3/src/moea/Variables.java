@@ -26,4 +26,6 @@ public class Variables {
 	
 	public static int minimumSegmentSize = 150;
 	public static int maxmimumSegmentSizeForMutationMerge = 1000;
+	
+	public static int optimalNumberOfSegments = 14;
 }
