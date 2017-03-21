@@ -277,7 +277,7 @@ public class Chromosome {
 				}
 			}
 		}
-		System.out.println("Number of segments: " + segments.size());
+//		System.out.println("Number of segments: " + segments.size());
 		decodeChromosome(pixels);
 		
 	}

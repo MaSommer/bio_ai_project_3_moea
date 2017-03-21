@@ -217,12 +217,12 @@ public class HelpMethods {
 		return pixelMap;
 	}
 	
-	public static ArrayList<Chromosome> createPopulationImproved(ArrayList<Pixel> pixelsMST, int populationSize, ArrayList<Pixel> pixels){
+	public static ArrayList<Chromosome> createPopulationImproved(ArrayList<Pixel> pixelsMST, ArrayList<Pixel> pixels){
 		ArrayList<Chromosome> population = new ArrayList<Chromosome>();
 		ArrayList<Pixel> cuttedChromosome = (ArrayList<Pixel>) pixelsMST.clone();
 		HashMap<Pixel, ArrayList<Integer>> mapPixelsThatPointsOnPixel = createMapPixelToIndex((ArrayList<Pixel>) pixelsMST.clone());
 		int pixelIdToCut = cutIntoTwoSegments(pixelsMST, pixels, mapPixelsThatPointsOnPixel, pixels);
-		for (int i = 0; i < populationSize+20; i++) {
+		for (int i = 0; i < Variables.pSize/2+20; i++) {
 			long startTime = System.nanoTime();
 			
 			cuttedChromosome.set(pixelIdToCut, pixels.get(pixelIdToCut));
