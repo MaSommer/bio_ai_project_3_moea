@@ -296,9 +296,6 @@ public class Chromosome {
 		
 	}
 
-	public ArrayList<Integer> getPixelToSegment() {
-		return pixelToSegment;
-	}
 	
 	public String toString(){
 		return "" + id;
