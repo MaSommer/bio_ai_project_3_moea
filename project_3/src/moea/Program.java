@@ -141,15 +141,15 @@ public class Program {
 		
 		Chromosome individual = new Chromosome(workingCopy, pixels, 10, distances, this.image);
 		
-//		int counter = 0;
-//		while(individual.getSegments().size() > maxSegments){
-//			individual.removeSmallSegments(maxSegmentSize);
-//			counter ++;
-//			if(counter == 100){
-//				break;
-//			}
-//		}
-//		individual.updateChromosome();
+		int counter = 0;
+		while(individual.getSegments().size() > maxSegments){
+			individual.removeSmallSegments(maxSegmentSize);
+			counter ++;
+			if(counter == 100){
+				break;
+			}
+		}
+		individual.updateChromosome();
 		return individual;
 	}
 
@@ -344,6 +344,16 @@ public class Program {
 //			long duration = endTime - startTime;
 //			System.out.println("Duration: " + duration/Math.pow(10, 9) + " sec");
 //		}
+
+		this.population = HelpMethods.createPopulation(MST, pixels, image, distances);
+		for (int i = 0; i < Variables.pSize/2; i++) {
+			long startTime = System.nanoTime();
+			ArrayList<ArrayList<Pixel>> segmentedPixels = paintWithKmeans(10);
+			population.add(encode(segmentedPixels, 30, i*10+20));
+			long endTime = System.nanoTime();
+			long duration = endTime - startTime;
+			System.out.println("Duration: " + duration/Math.pow(10, 9) + " sec");
+		}
 	}
 	
 	public void run(){

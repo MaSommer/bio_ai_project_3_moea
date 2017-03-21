@@ -209,14 +209,6 @@ public class HelpMethods {
 		return pixelsMST;
 	}
 	
-	public static HashMap<Integer, Pixel> generatePixelMap(ArrayList<Pixel> pixels){
-		HashMap<Integer, Pixel> pixelMap = new HashMap<Integer, Pixel>();
-		for (int i = 0; i < pixels.size(); i++) {
-			pixelMap.put(i, pixels.get(i));
-		}
-		return pixelMap;
-	}
-	
 	public static ArrayList<Chromosome> createPopulation(ArrayList<Pixel> pixelsMST, ArrayList<Pixel> pixels, ArrayList<ArrayList<Pixel>> image, ArrayList<double[]> distances){
 		ArrayList<Chromosome> population = new ArrayList<Chromosome>();
 		ArrayList<Pixel> cuttedChromosome = (ArrayList<Pixel>) pixelsMST.clone();

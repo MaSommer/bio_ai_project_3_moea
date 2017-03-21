@@ -11,7 +11,7 @@ import java.util.PriorityQueue;
 
 
 public class Nsga2Operations {
-	
+
 	public static ArrayList<Chromosome> selection(ArrayList<Chromosome> population){
 		ArrayList<Chromosome> selectedChromosome = new ArrayList<Chromosome>();
 		HashMap<Integer, ArrayList<Chromosome>> frontierMap = fastNonDominatedSort(population);
@@ -34,10 +34,10 @@ public class Nsga2Operations {
 		}
 		return selectedChromosome;
 	}
-	
-	
+
+
 	public static ArrayList<Chromosome> crossover(ArrayList<Chromosome> population){
-		
+
 		return population;
 	}
 	
@@ -138,20 +138,9 @@ public class Nsga2Operations {
 		
 	}
 	
+
 	public static void mutation(Chromosome chromosome, ArrayList<Pixel> pixels){
 		double random = Math.random();
-		for (ArrayList<Pixel> segment : chromosome.getSegments()) {
-			boolean point = false;
-			for (Pixel pixel : segment) {
-				if (chromosome.getRepresentation().get(pixel.getId()).getId() == pixel.getId()){
-					point = true;
-					break;
-				}
-			}
-			if (point == false){
-				throw new IllegalArgumentException("Mutation, Chr: " + chromosome.getId() + " Segmentsize: " + segment.size());
-			}
-		}
 		if (random < Variables.mutationMergeRate){
 			mutationMerge(chromosome, pixels);
 		}
@@ -159,9 +148,9 @@ public class Nsga2Operations {
 			mutationSplit(chromosome, pixels);
 		}
 	}
-	
+
 	public static void mutationMerge(Chromosome chromosome, ArrayList<Pixel> pixels){
-//		System.out.println("was mutated: " + chromosome.getId());
+		//		System.out.println("was mutated: " + chromosome.getId());
 		ArrayList<ArrayList<Pixel>> segments = chromosome.getSegments();
 		int randomSegment = (int)(Math.random()*segments.size());
 		while (segments.get(randomSegment).size() < Variables.maxmimumSegmentSizeForMutationMerge){
@@ -169,60 +158,61 @@ public class Nsga2Operations {
 		}
 		ArrayList<Pixel> segmentEdges = chromosome.getSegmentEdges().get(randomSegment);
 		ArrayList<Pixel> representation = chromosome.getRepresentation();
-		
+
 		double[] segmentRGB = chromosome.getSegmentAvgRGBValues().get(randomSegment);
 		double bestRGBDistace = Double.POSITIVE_INFINITY;
 		int pixelToMerge = -1;
-		int neighbourPixelToMerge = -1;
 		int bestSegmentToMerge = -1;
 		//finds the lowest deviation distance
 		for (Pixel pixel : segmentEdges) {
 			//tests if pixel points to itself
-			if (representation.get(pixel.getId()) == pixel){
-				for (Pixel neighbour : pixel.getNeighbours()) {
-					int neighbourSegment = chromosome.getPixelToSegment().get(neighbour.getId());
-					if (randomSegment != neighbourSegment){
-						double[] neighbourSegmentRGB = chromosome.getSegmentAvgRGBValues().get(neighbourSegment);
-						double rgbDistance = Functions.rgbDistance(segmentRGB, neighbourSegmentRGB);
-						if (rgbDistance < bestRGBDistace){
-							bestRGBDistace = rgbDistance;
-							pixelToMerge = pixel.getId();
-							neighbourPixelToMerge = neighbour.getId();
-							bestSegmentToMerge = neighbourSegment;
-						}
+			for (Pixel neighbour : pixel.getNeighbours()) {
+				int neighbourSegment = chromosome.getPixelToSegment().get(neighbour.getId());
+				if (randomSegment != neighbourSegment){
+					double[] neighbourSegmentRGB = chromosome.getSegmentAvgRGBValues().get(neighbourSegment);
+					double rgbDistance = Functions.rgbDistance(segmentRGB, neighbourSegmentRGB);
+					if (rgbDistance < bestRGBDistace){
+						bestRGBDistace = rgbDistance;
+						pixelToMerge = pixel.getId();
+						bestSegmentToMerge = neighbourSegment;
 					}
 				}
 			}
-		}
-		boolean point = false;
-		for (Pixel p : segments.get(randomSegment)) {
-			if (representation.get(p.getId()).getId() == p.getId()){
-				point = true;
-//				System.out.println(point);
+			if (representation.get(pixel.getId()) == pixel){
 			}
 		}
-		if (pixelToMerge == -1){
-			return;
-		}
-		int bestNeighbourToMerge = -1;
-		double bestEdgeValue = Double.POSITIVE_INFINITY;
+		ArrayList<Pixel> segment1 = segments.get(randomSegment);
+		ArrayList<Pixel> segment2 = segments.get(bestSegmentToMerge);
 		
-		//choose to merge with the lowest edge value 
-		for (Pixel neighbour : pixels.get(pixelToMerge).getNeighbours()) {
-			int neighbourSegment = chromosome.getPixelToSegment().get(neighbour.getId());
-			double edgeValue = Functions.pixelToPixelDeviation(pixels.get(pixelToMerge), neighbour);
-			if (edgeValue < bestEdgeValue && neighbourSegment != chromosome.getPixelToSegment().get(pixelToMerge) && bestSegmentToMerge == neighbourSegment){
-				bestEdgeValue = edgeValue;
-				bestNeighbourToMerge = neighbour.getId();
-			}
-		}
-		if (pixelToMerge != -1 && neighbourPixelToMerge != -1 && bestRGBDistace < 50){
-			chromosome.getRepresentation().set(pixelToMerge, pixels.get(bestNeighbourToMerge));
-			chromosome.updateChromosome();
-		}
-		
+//		boolean point = false;
+//		for (Pixel p : segments.get(randomSegment)) {
+//			if (representation.get(p.getId()).getId() == p.getId()){
+//				point = true;
+//				//				System.out.println(point);
+//			}
+//		}
+//		if (pixelToMerge == -1){
+//			return;
+//		}
+//		int bestNeighbourToMerge = -1;
+//		double bestEdgeValue = Double.POSITIVE_INFINITY;
+//
+//		//choose to merge with the lowest edge value 
+//		for (Pixel neighbour : pixels.get(pixelToMerge).getNeighbours()) {
+//			int neighbourSegment = chromosome.getPixelToSegment().get(neighbour.getId());
+//			double edgeValue = Functions.pixelToPixelDeviation(pixels.get(pixelToMerge), neighbour);
+//			if (edgeValue < bestEdgeValue && neighbourSegment != chromosome.getPixelToSegment().get(pixelToMerge) && bestSegmentToMerge == neighbourSegment){
+//				bestEdgeValue = edgeValue;
+//				bestNeighbourToMerge = neighbour.getId();
+//			}
+//		}
+//		if (pixelToMerge != -1 && neighbourPixelToMerge != -1 && bestRGBDistace < 50){
+//			chromosome.getRepresentation().set(pixelToMerge, pixels.get(bestNeighbourToMerge));
+//			chromosome.updateChromosome();
+//		}
+
 	}
-	
+
 	public static void mutationSplit(Chromosome chromosome, ArrayList<Pixel> pixels){
 		HashMap<Pixel, ArrayList<Integer>> mapPixelsThatPointsOnPixel = HelpMethods.createMapPixelToIndex(chromosome.getRepresentation());
 		ArrayList<ArrayList<Pixel>> segments = chromosome.getSegments();
@@ -236,8 +226,8 @@ public class Nsga2Operations {
 		}
 		chromosome.updateChromosome();
 	}
-	
-	
+
+
 	public static void crowdingDistanceAssignment(HashMap<Integer, ArrayList<Chromosome>> frontierMap){
 		Iterator it = frontierMap.entrySet().iterator();
 		while (it.hasNext()) {
@@ -267,7 +257,7 @@ public class Nsga2Operations {
 			}
 		}
 	}
-	
+
 	public static double getActiveObjective(int i, Chromosome chr){
 		if (i == 0){
 			return chr.getDeviationFitness();
@@ -279,7 +269,7 @@ public class Nsga2Operations {
 			return chr.getConnectivityFitness();
 		}
 	}
-	
+
 	public static void sortArrayListsInFrontierMap(int i, HashMap<Integer, ArrayList<Chromosome>> frontierMap){
 		Iterator it = frontierMap.entrySet().iterator();
 		if (i == 0){
@@ -287,7 +277,7 @@ public class Nsga2Operations {
 				Map.Entry pair = (Map.Entry)it.next();
 				Collections.sort((ArrayList<Chromosome>) pair.getValue(), new Comparator<Chromosome>() {
 					public int compare(Chromosome chr1, Chromosome chr2) {
-						
+
 						return Double.compare(chr1.getDeviationFitness(), chr2.getDeviationFitness());
 					}
 				});
@@ -298,7 +288,7 @@ public class Nsga2Operations {
 				Map.Entry pair = (Map.Entry)it.next();
 				Collections.sort((ArrayList<Chromosome>) pair.getValue(), new Comparator<Chromosome>() {
 					public int compare(Chromosome chr1, Chromosome chr2) {
-						
+
 						return Double.compare(chr1.getEdgeFitness(), chr2.getEdgeFitness());
 					}
 				});;
@@ -309,7 +299,7 @@ public class Nsga2Operations {
 				Map.Entry pair = (Map.Entry)it.next();
 				Collections.sort((ArrayList<Chromosome>) pair.getValue(), new Comparator<Chromosome>() {
 					public int compare(Chromosome chr1, Chromosome chr2) {
-						
+
 						return Double.compare(chr1.getConnectivityFitness(), chr2.getConnectivityFitness());
 					}
 				});;
@@ -324,7 +314,7 @@ public class Nsga2Operations {
 		HashMap<Integer,ArrayList<Chromosome>> frontiers = new HashMap<Integer,ArrayList<Chromosome>>();
 		HashMap<Chromosome,Integer> dominationCount= new HashMap<Chromosome,Integer>();
 		HashMap<Chromosome,ArrayList<Chromosome>> dominates = new HashMap<Chromosome, ArrayList<Chromosome>>();
-		
+
 
 		for(Chromosome p:population){
 			ArrayList<Chromosome> pDominates = new ArrayList<Chromosome>();
@@ -387,7 +377,7 @@ public class Nsga2Operations {
 				counter++;
 			}
 		}
-		
+
 		int fitness1IsBigger = 0;
 		int fitness2IsBigger = 0;
 
@@ -408,32 +398,32 @@ public class Nsga2Operations {
 		if(fitness2IsBigger == counter){
 			dominator = c1;
 		}
-		
+
 		return dominator;
 
 	}
-//	public static void main(String[] args) {
-//		ArrayList<Chromosome> pop = Chromosome.testCrowdChromosomes();
-//		ArrayList<Chromosome> empty = new ArrayList<Chromosome>();
-//		HashMap<Integer,ArrayList<Chromosome>> map = new HashMap<Integer,ArrayList<Chromosome>>();
-//		map.put(1, pop);
-//		map.put(2, empty);
-//		crowdingDistanceAssignment(map);
-//		System.out.println(map.get(1));
-//		Collections.sort(pop, new Comparator<Chromosome>() {
-//			public int compare(Chromosome chr1, Chromosome chr2) {
-//				return -Double.compare(chr1.getFitnessValue(), chr2.getFitnessValue());
-//			}
-//		});
-//		System.out.println(map.get(1));
-//		for(int i = 1 ; i < map.size()+1; i++){
-//		}
-		
-//		Nsga2Operations.crowdingDistanceAssignment(map);
-//		ArrayList<Chromosome> toPrint = map.get(1);
-//		System.out.println(toPrint);
-//		
-//	}
+	//	public static void main(String[] args) {
+	//		ArrayList<Chromosome> pop = Chromosome.testCrowdChromosomes();
+	//		ArrayList<Chromosome> empty = new ArrayList<Chromosome>();
+	//		HashMap<Integer,ArrayList<Chromosome>> map = new HashMap<Integer,ArrayList<Chromosome>>();
+	//		map.put(1, pop);
+	//		map.put(2, empty);
+	//		crowdingDistanceAssignment(map);
+	//		System.out.println(map.get(1));
+	//		Collections.sort(pop, new Comparator<Chromosome>() {
+	//			public int compare(Chromosome chr1, Chromosome chr2) {
+	//				return -Double.compare(chr1.getFitnessValue(), chr2.getFitnessValue());
+	//			}
+	//		});
+	//		System.out.println(map.get(1));
+	//		for(int i = 1 ; i < map.size()+1; i++){
+	//		}
+
+	//		Nsga2Operations.crowdingDistanceAssignment(map);
+	//		ArrayList<Chromosome> toPrint = map.get(1);
+	//		System.out.println(toPrint);
+	//		
+	//	}
 
 
 }
