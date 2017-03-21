@@ -54,6 +54,16 @@ public class Program {
 
 	}
 	
+	public static void paintSegments(Chromosome c){
+		int counter = 0;
+		for(ArrayList<Pixel> segment:c.getSegments()){
+			for(Pixel p : segment){
+				p.setColor(colors[counter%colors.length]);
+			}
+			counter++;
+		}
+	}
+	
 	public double calculateNeuronDistance(double[] values, Pixel p){
 		double redDist = Math.pow(p.getRed()-values[0], 2);
 		double greenDist = Math.pow(p.getGreen()-values[1], 2);
@@ -127,18 +137,19 @@ public class Program {
 					workingCopy.set(p.getId(), p);
 				}
 			}
-			
 		}
-		Chromosome individual = new Chromosome(workingCopy, pixels, 10);
-		int counter = 0;
-		while(individual.getSegments().size() > maxSegments){
-			individual.removeSmallSegments(maxSegmentSize);
-			counter ++;
-			if(counter == 100){
-				break;
-			}
-		}
-		individual.updateChromosome();
+		
+		Chromosome individual = new Chromosome(workingCopy, pixels, 10, distances);
+		
+//		int counter = 0;
+//		while(individual.getSegments().size() > maxSegments){
+//			individual.removeSmallSegments(maxSegmentSize);
+//			counter ++;
+//			if(counter == 100){
+//				break;
+//			}
+//		}
+//		individual.updateChromosome();
 		return individual;
 	}
 
@@ -324,7 +335,7 @@ public class Program {
 		
 		
 		
-		this.population = HelpMethods.createPopulationImproved(MST, pixels);
+		this.population = HelpMethods.createPopulation(MST, pixels, image, distances);
 		for (int i = 0; i < Variables.pSize/2; i++) {
 			long startTime = System.nanoTime();
 			ArrayList<ArrayList<Pixel>> segmentedPixels = paintWithKmeans(10);
@@ -345,30 +356,31 @@ public class Program {
 //			}
 //		}
 		for (int i = 0; i < Variables.numberOfGenerations; i++) {
-			ArrayList<Chromosome> selectedPopulation = Nsga2Operations.selection(population);
-			population = HelpMethods.crossover(selectedPopulation, pixels);
-			HelpMethods.mutation(population);
-			
+			population = Nsga2Operations.selection(population);
+//			population = HelpMethods.crossover(selectedPopulation, pixels);
+			for (int j = 0; j < 4; j++) {
+				for (Chromosome chromosome : population) {
+					Nsga2Operations.mutation(chromosome, pixels);
+				}							
+			}
 			long endTime = System.nanoTime();
 			long duration = endTime - startTime;
 			System.out.println("Generation number: " + generations + ", current best chromosome fitness: " + HelpMethods.findBestChromosome(population).getFitnessValue() + " Duration: " + duration/Math.pow(10,9)+ " sec");
-			if (generations % 50 == 0){
-			}
 			generations++;
 		}
-		HashMap<Integer, ArrayList<Chromosome>> frontierMap = Nsga2Operations.fastNonDominatedSort(population);
-		ArrayList<Chromosome> frontier1 = frontierMap.get(1);
-		for(Chromosome chr: frontier1){
-			Chromosome solution = chr;
-			int counter = 0;
-			while(solution.getSegments().size() > 30 && counter < 100){
-				solution.removeSmallSegments(70);
-				counter++;
-			}
-			solution.updateChromosome();
-		}
+//		HashMap<Integer, ArrayList<Chromosome>> frontierMap = Nsga2Operations.fastNonDominatedSort(population);
+//		ArrayList<Chromosome> frontier1 = frontierMap.get(1);
+//		for(Chromosome chr: frontier1){
+//			Chromosome solution = chr;
+//			int counter = 0;
+//			while(solution.getSegments().size() > 30 && counter < 100){
+//				solution.removeSmallSegments(70);
+//				counter++;
+//			}
+//			solution.updateChromosome();
+//		}
 		
-		HelpMethods.paintEdgesGreen(HelpMethods.findBestChromosome(frontier1));
+		HelpMethods.paintEdgesGreen(HelpMethods.findBestChromosome(population));
 		HelpMethods.drawImage(image);
 	}
 	
@@ -383,7 +395,7 @@ public class Program {
 	
 	
 	public static void main(String[] args) throws IOException {
-		String imagePath = "Test Image/1/Test Image.jpg";
+		String imagePath = "Test Image/1/Test image.jpg";
 		Program p = new Program(imagePath);
 		p.init();
 		p.run();

@@ -2,13 +2,15 @@ package moea;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.HashMap;
+import java.util.PriorityQueue;
 
 public class Chromosome {
 	
 	private ArrayList<ArrayList<Pixel>> segments;
 	private ArrayList<Pixel> representation;
-	private ArrayList<ArrayList<Pixel>> segmentEdges;
+	private ArrayList<ArrayList<Pixel>> segmentEdges; 
 	private ArrayList<Integer> pixelToSegment;
 	
 	private ArrayList<double[]> segmentAvgRGBValues;
@@ -20,29 +22,26 @@ public class Chromosome {
 	private double deviationFitness;
 	private double edgeFitness;
 	private double connectivityFitness;
+	private ArrayList<double[]> distances;
  	
 	//mapper segmentnummer til fitnessvalues {deviation, edges, connectivity}
 	private ArrayList<double[]> segmentFitnessValues;
 	
-	public Chromosome(ArrayList<Pixel> representation, ArrayList<Pixel> pixels, int id){
+	public Chromosome(ArrayList<Pixel> representation, ArrayList<Pixel> pixels, int id, ArrayList<double[]> distances){
 		System.out.println("CHROMOSOME NR " + id);
 		this.representation = representation;
+		this.distances = distances;
 		segmentFitnessValues = new ArrayList<double[]>();
 		this.id = id;
 		this.pixels = pixels;
 		
 		decodeChromosome(pixels);
-		long startTime = System.nanoTime();
 		this.segmentEdges = HelpMethods.generateSegmentEdges(segments, pixelToSegment);
-		long endTime = System.nanoTime();
-		long duration = (endTime - startTime);
-//		System.out.println("Segment edges: "+ duration/Math.pow(10, 9) + " sec");
+
 		segmentFitnessValues = new ArrayList<double[]>();
-		long startTime1 = System.nanoTime();
+		
 		updateSegmentFitnessValues();
-		long endTime1 = System.nanoTime();
-		long duration1 = (endTime1 - startTime1);
-//		System.out.println("Update fitness values: " + duration1/Math.pow(10, 9) + " sec");
+
 		updateFitnessParameters();
 	}
 	
@@ -71,7 +70,7 @@ public class Chromosome {
 		ArrayList<Chromosome> pop = new ArrayList<Chromosome>();
 		double[][] fitnessValues = {{3,3,3}, {5,2,6}, {0,3,4},{1,4,4}, {1,4,5}, {3,3,4}, {5,6,3}, {2,5,6}, {1,7,9}, {3,6,7}};
 		for(int i = 0 ; i < fitnessValues.length ; i++){
-			Chromosome chr1 = new Chromosome(repr, repr, i+1);
+			Chromosome chr1 = new Chromosome(repr, repr, i+1, new ArrayList<double[]>());
 			double[] fitnesses = fitnessValues[i];
 			chr1.setConnectivityFitness(fitnesses[0]);
 			chr1.setDeviationFitness(fitnesses[1]);
@@ -86,7 +85,7 @@ public class Chromosome {
 		ArrayList<Chromosome> pop = new ArrayList<Chromosome>();
 		double[][] fitnessValues = {{35,7,1},{80,37,4},{1,2,9}, {27,4,15}, {10,16,22}, {6,11,30}, {45,1,39}, {15,22,49}, {21,29,60}, {3,50,73}};
 		for(int i = 0 ; i < fitnessValues.length ; i++){
-			Chromosome chr1 = new Chromosome(repr, repr, i+1);
+			Chromosome chr1 = new Chromosome(repr, repr, i+1, new ArrayList<double[]>());
 			double[] fitnesses = fitnessValues[i];
 			chr1.setConnectivityFitness(fitnesses[0]);
 			chr1.setDeviationFitness(fitnesses[1]);
@@ -157,8 +156,11 @@ public class Chromosome {
 		decodeChromosome(pixels); //Assume the representation has changed. Now we decode the chromosome
 		this.segmentEdges = HelpMethods.generateSegmentEdges(segments, pixelToSegment);
 		updateFitnessParameters();
+		
 	}
-	
+	public int getId(){
+		return id;
+	}
 	
 	public double getDeviationFitness() {
 		return deviationFitness;
@@ -202,10 +204,8 @@ public class Chromosome {
 		int lastStartIndex = 0;
 		Pixel newPixel=null;
 		
-		long startTime3 = System.nanoTime();
 		int chainNr = 0;
 		while(remainingPixels > 0){
-			long startTime4 = System.nanoTime();
 			ArrayList<Pixel> chain = new ArrayList<Pixel>(); //Ny kjede som foelges til en ende
 			for(int i = lastStartIndex ; i < visited.size(); i++){    //finner foerste ledige sted aa starte fra
 				if(!visited.get(i)){
@@ -291,6 +291,88 @@ public class Chromosome {
 		decodeChromosome(pixels);
 		
 	}
+	
+//	public void mergeSegments(ArrayList<Pixel> segment1, ArrayList<Pixel> segment2){
+//		long startTime = System.nanoTime();
+//		ArrayList<Pixel> newSegment = new ArrayList<Pixel>(segment1);
+//		for(Pixel p: segment2){
+//			newSegment.add(p);
+//		}
+//
+//		int pixelsRemaining = newSegment.size()-1;
+//		for(Pixel p:newSegment){
+//			this.representation.set(p.getId(), null);
+//		}
+//		
+//		Comparator<Edge> edgeComparator = new Comparator<Edge>() {
+//			public int compare(Edge e1, Edge e2){
+//				if (e1.getWeight() > e2.getWeight()){
+//					return 1;
+//				}
+//				else if (e1.getWeight() < e2.getWeight()){
+//					return -1;
+//				}
+//				else {
+//					return 0;
+//				}
+//			}
+//		};
+//		PriorityQueue<Edge> edges = new PriorityQueue<Edge>(10, edgeComparator);
+//		int indexInNewSeg = 0;
+//		int currentPixel = newSegment.get(indexInNewSeg).getId();
+//		representation.set(currentPixel, pixels.get(currentPixl));
+//		
+//		while(pixelsRemaining > 0) {
+//			
+//			ArrayList<Edge> currentPixelsEdges = new ArrayList<Edge>();
+//			int toPixelIndex = currentPixel;
+//			for(int j = 0 ; j < 4 ; j++){
+//				double distance = distances.get(currentPixel)[j];
+//				if(distance == -1){
+//					continue;
+//				}
+//				else{
+//					int fromPixelIndex = -1;
+//					if(j == 0){
+//						fromPixelIndex = currentPixel - image.get(0).size(); //NORTH pixel
+//					}
+//					else if(j == 1){
+//						fromPixelIndex = currentPixel+ image.get(0).size(); //SOUTH pixel
+//					}
+//					else if(j == 2){
+//						fromPixelIndex = currentPixel +1;//EAST pixel
+//					}
+//					else if(j == 3) {
+//						fromPixelIndex = currentPixel- 1; //WEST
+//					}
+//					Pixel fromPixel = pixels.get(fromPixelIndex);
+//					Pixel toPixel = pixels.get(currentPixel);
+//					
+//					if(MST.get(fromPixelIndex) == null){
+//						currentPixelsEdges.add(new Edge(fromPixel, toPixel, distance));
+//						currentPixelsEdges.add(new Edge(toPixel, fromPixel, distance));
+//					}
+//				}
+//			}
+//			for(Edge e : currentPixelsEdges){
+//				edges.add(e);
+//			}
+//			while(true){
+//				Edge e = edges.poll();
+//				
+//				if(MST.get(e.getFrom().getId()) == null){
+////					System.out.println("Used edge: " + e);
+//					Pixel fromPixel = e.getFrom();
+//					Pixel toPixel = e.getTo();
+//					MST.set(fromPixel.getId(), toPixel);
+//					pixelsRemaining--;
+//					currentPixel = fromPixel.getId();
+//					break;
+//				}
+//
+//			}
+//		
+//	}
 
 	public ArrayList<Integer> getPixelToSegment() {
 		return pixelToSegment;
