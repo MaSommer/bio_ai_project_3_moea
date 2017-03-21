@@ -26,8 +26,8 @@ public class Functions {
 		return Math.pow(notSquaredDev, 0.5);
 	}
 	
-	public static double segmentDeviation(ArrayList<Pixel> segment){
-		double deviation = 0;
+	public static double[] segmentDeviation(ArrayList<Pixel> segment){
+		double[] deviation = {0.0, 0.0, 0.0, 0.0};
 		double red = 0;
 		double green = 0;
 		double blue = 0;
@@ -36,17 +36,42 @@ public class Functions {
 			blue+=p.getBlue();
 			green+=p.getGreen();
 		}
+		deviation[1] = red/segment.size();
+		deviation[2] = green/segment.size();
+		deviation[3] = blue/segment.size();
 		ArrayList<Double> rgbValues = new ArrayList<Double>();
 		rgbValues.add(red/segment.size());
 		rgbValues.add(green/segment.size());
 		rgbValues.add(blue/segment.size());
 		
 		for(Pixel p:segment){
-			deviation+=pixelDeviation(rgbValues,p);
+			deviation[0]+=pixelDeviation(rgbValues,p);
 		}
-		
 		return deviation;
+	}
 	
+	public static double[] averageRGB(ArrayList<Pixel> segment){
+		double[] rgb = {0.0, 0.0, 0.0};
+		for(Pixel p:segment){
+			rgb[0]+=p.getRed();
+			rgb[1]+=p.getGreen();
+			rgb[2]+=p.getBlue();
+		}
+		rgb[0] = rgb[0]/segment.size();
+		rgb[1] = rgb[1]/segment.size();
+		rgb[1] = rgb[1]/segment.size();
+		
+		return rgb;
+	}
+	
+	public static double rgbDistance(double[] rgb1, double[] rgb2){
+		double r1 = rgb1[0];
+		double r2 = rgb2[0];
+		double g1 = rgb1[1];
+		double g2 = rgb2[1];
+		double b1 = rgb1[2];
+		double b2 = rgb2[2];
+		return Math.sqrt(Math.pow(r1 - r2, 2) + Math.pow(g1 - g2, 2) + Math.pow(b1 - b2, 2));
 	}
 	
 	public static double segmentConnectivity(ArrayList<Pixel> segment, int segmentNr, ArrayList<Integer> pixelsToSegment){

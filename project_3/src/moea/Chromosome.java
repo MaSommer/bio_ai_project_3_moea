@@ -10,6 +10,9 @@ public class Chromosome {
 	private ArrayList<Pixel> representation;
 	private ArrayList<ArrayList<Pixel>> segmentEdges;
 	private ArrayList<Integer> pixelToSegment;
+	
+	private ArrayList<double[]> segmentAvgRGBValues;
+
 	private double fitnessValue;
 	private int id;
 	private ArrayList<Pixel> pixels;
@@ -27,7 +30,7 @@ public class Chromosome {
 		segmentFitnessValues = new ArrayList<double[]>();
 		this.id = id;
 		this.pixels = pixels;
-
+		
 		decodeChromosome(pixels);
 		long startTime = System.nanoTime();
 		this.segmentEdges = HelpMethods.generateSegmentEdges(segments, pixelToSegment);
@@ -112,16 +115,23 @@ public class Chromosome {
 	private void updateSegmentFitnessValues(){
 		int segmentNr = 0;
 		segmentFitnessValues = new ArrayList<double[]>();
+		segmentAvgRGBValues = new ArrayList<double[]>();
 		for (ArrayList<Pixel> segment : segments) {
-			double deviation = Functions.segmentDeviation(segment);
+			double[] deviation = Functions.segmentDeviation(segment);
 			double edgeFitness = Functions.segmentEdgeValue(segmentEdges.get(segmentNr), segment, segmentNr, pixelToSegment);
 			double connectivity = Functions.segmentConnectivity(segment, segmentNr, pixelToSegment);
-			double[] fitnessValues = {deviation, edgeFitness, connectivity};
+			double[] fitnessValues = {deviation[0], edgeFitness, connectivity};
 			segmentFitnessValues.add(fitnessValues);
+			double[] avgRGB = {deviation[1], deviation[2], deviation[3]};
+			segmentAvgRGBValues.add(avgRGB);
 			segmentNr++;
 		}
 	}
 	
+	public ArrayList<double[]> getSegmentAvgRGBValues() {
+		return segmentAvgRGBValues;
+	}
+
 	public void mutate(){
 		int fromPixelIndex = (int) (representation.size() * Math.random());
 		Pixel fromPixel = pixels.get(fromPixelIndex);
@@ -286,7 +296,9 @@ public class Chromosome {
 		
 	}
 
-
+	public ArrayList<Integer> getPixelToSegment() {
+		return pixelToSegment;
+	}
 	
 	public String toString(){
 		return "" + id;
