@@ -97,6 +97,10 @@ public class Functions {
 	public static ArrayList<Pixel> getEdge(ArrayList<Pixel> segment, int segmentNr, ArrayList<Integer> pixelToSegment){
 		ArrayList<Pixel> edge = new ArrayList<Pixel>();
 		for(Pixel p : segment){
+			if (p.getNeighbours().size() <4){
+				edge.add(p);
+				continue;				
+			}
 			for(Pixel neighbour: p.getNeighbours()){
 				if (pixelToSegment.get(neighbour.getId()) != segmentNr){
 					edge.add(p);
@@ -104,7 +108,6 @@ public class Functions {
 				}
 			}
 		}
-//		System.out.println("getEdge: " + duration/Math.pow(10, 9) + " sec");
 		return edge;
 	}
 	
@@ -113,7 +116,7 @@ public class Functions {
 		for(Pixel p: segmentEdges){
 			for(Pixel neighbour: p.getNeighbours()){
 				if (pixelsToSegment.get(neighbour.getId()) == segmentNr){
-					edgeValue-= pixelToPixelDeviation(p, neighbour);					
+					edgeValue += pixelToPixelDeviation(p, neighbour);					
 				}
 			}
 		}

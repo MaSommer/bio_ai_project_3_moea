@@ -40,28 +40,103 @@ public class Nsga2Operations {
 		return population;
 	}
 	
-	public static Chromosome mutation(Chromosome chromosome){
+	public static void mutation(Chromosome chromosome, ArrayList<Pixel> pixels){
 		double random = Math.random();
-		
+		for (ArrayList<Pixel> segment : chromosome.getSegments()) {
+			boolean point = false;
+			for (Pixel pixel : segment) {
+				if (chromosome.getRepresentation().get(pixel.getId()).getId() == pixel.getId()){
+					point = true;
+					break;
+				}
+			}
+			if (point == false){
+				throw new IllegalArgumentException("Mutation, Chr: " + chromosome.getId() + " Segmentsize: " + segment.size());
+			}
+		}
 		if (random < Variables.mutationMergeRate){
-			
+			mutationMerge(chromosome, pixels);
 		}
 		else{
-			
+			mutationSplit(chromosome, pixels);
 		}
-		return chromosome;
 	}
 	
-	public static Chromosome mutationMerge(Chromosome chromosome){
+	public static void mutationMerge(Chromosome chromosome, ArrayList<Pixel> pixels){
+//		System.out.println("was mutated: " + chromosome.getId());
+		ArrayList<ArrayList<Pixel>> segments = chromosome.getSegments();
+		int randomSegment = (int)(Math.random()*segments.size());
+		while (segments.get(randomSegment).size() < Variables.maxmimumSegmentSizeForMutationMerge){
+			randomSegment = (int)(Math.random()*segments.size());			
+		}
+		ArrayList<Pixel> segmentEdges = chromosome.getSegmentEdges().get(randomSegment);
+		ArrayList<Pixel> representation = chromosome.getRepresentation();
 		
+		double[] segmentRGB = chromosome.getSegmentAvgRGBValues().get(randomSegment);
+		double bestRGBDistace = Double.POSITIVE_INFINITY;
+		int pixelToMerge = -1;
+		int neighbourPixelToMerge = -1;
+		int bestSegmentToMerge = -1;
+		//finds the lowest deviation distance
+		for (Pixel pixel : segmentEdges) {
+			//tests if pixel points to itself
+			if (representation.get(pixel.getId()) == pixel){
+				for (Pixel neighbour : pixel.getNeighbours()) {
+					int neighbourSegment = chromosome.getPixelToSegment().get(neighbour.getId());
+					if (randomSegment != neighbourSegment){
+						double[] neighbourSegmentRGB = chromosome.getSegmentAvgRGBValues().get(neighbourSegment);
+						double rgbDistance = Functions.rgbDistance(segmentRGB, neighbourSegmentRGB);
+						if (rgbDistance < bestRGBDistace){
+							bestRGBDistace = rgbDistance;
+							pixelToMerge = pixel.getId();
+							neighbourPixelToMerge = neighbour.getId();
+							bestSegmentToMerge = neighbourSegment;
+						}
+					}
+				}
+			}
+		}
+		boolean point = false;
+		for (Pixel p : segments.get(randomSegment)) {
+			if (representation.get(p.getId()).getId() == p.getId()){
+				point = true;
+//				System.out.println(point);
+			}
+		}
+		if (pixelToMerge == -1){
+			return;
+		}
+		int bestNeighbourToMerge = -1;
+		double bestEdgeValue = Double.POSITIVE_INFINITY;
 		
-		return chromosome;
+		//choose to merge with the lowest edge value 
+		for (Pixel neighbour : pixels.get(pixelToMerge).getNeighbours()) {
+			int neighbourSegment = chromosome.getPixelToSegment().get(neighbour.getId());
+			double edgeValue = Functions.pixelToPixelDeviation(pixels.get(pixelToMerge), neighbour);
+			if (edgeValue < bestEdgeValue && neighbourSegment != chromosome.getPixelToSegment().get(pixelToMerge) && bestSegmentToMerge == neighbourSegment){
+				bestEdgeValue = edgeValue;
+				bestNeighbourToMerge = neighbour.getId();
+			}
+		}
+		if (pixelToMerge != -1 && neighbourPixelToMerge != -1 && bestRGBDistace < 50){
+			chromosome.getRepresentation().set(pixelToMerge, pixels.get(bestNeighbourToMerge));
+			chromosome.updateChromosome();
+		}
+		
 	}
 	
-	public static Chromosome mutationSplit(Chromosome chromosome){
-		
-		
-		return chromosome;
+	public static void mutationSplit(Chromosome chromosome, ArrayList<Pixel> pixels){
+		HashMap<Pixel, ArrayList<Integer>> mapPixelsThatPointsOnPixel = HelpMethods.createMapPixelToIndex(chromosome.getRepresentation());
+		ArrayList<ArrayList<Pixel>> segments = chromosome.getSegments();
+		//Choosing the biggest segment to do a split
+		int randomSegment = (int)(Math.random()*segments.size());
+		ArrayList<Pixel> segment = segments.get(randomSegment);
+		int minSegmentSize = 10;
+		int pixelIdToCut = HelpMethods.cutIntoTwoSegments(chromosome.getRepresentation(), pixels, mapPixelsThatPointsOnPixel, segment, minSegmentSize);
+		if (pixelIdToCut != -1){
+			chromosome.getRepresentation().set(pixelIdToCut, pixels.get(pixelIdToCut));			
+		}
+		chromosome.updateChromosome();
 	}
 	
 	

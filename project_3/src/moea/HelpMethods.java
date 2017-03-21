@@ -217,17 +217,33 @@ public class HelpMethods {
 		return pixelMap;
 	}
 	
-	public static ArrayList<Chromosome> createPopulationImproved(ArrayList<Pixel> pixelsMST, ArrayList<Pixel> pixels){
+	public static ArrayList<Chromosome> createPopulation(ArrayList<Pixel> pixelsMST, ArrayList<Pixel> pixels, ArrayList<ArrayList<Pixel>> image, ArrayList<double[]> distances){
 		ArrayList<Chromosome> population = new ArrayList<Chromosome>();
 		ArrayList<Pixel> cuttedChromosome = (ArrayList<Pixel>) pixelsMST.clone();
 		HashMap<Pixel, ArrayList<Integer>> mapPixelsThatPointsOnPixel = createMapPixelToIndex((ArrayList<Pixel>) pixelsMST.clone());
-		int pixelIdToCut = cutIntoTwoSegments(pixelsMST, pixels, mapPixelsThatPointsOnPixel, pixels);
+		int pixelIdToCut = cutIntoTwoSegments(pixelsMST, pixels, mapPixelsThatPointsOnPixel, pixels, Variables.minimumSegmentSize);
 		for (int i = 0; i < Variables.pSize/2+20; i++) {
 			long startTime = System.nanoTime();
 			
 			cuttedChromosome.set(pixelIdToCut, pixels.get(pixelIdToCut));
-			Chromosome chr = new Chromosome((ArrayList<Pixel>) cuttedChromosome.clone(), pixels, i+1);
-			
+			Chromosome chr = new Chromosome((ArrayList<Pixel>) cuttedChromosome.clone(), pixels, i+1, distances);
+//			Program.paintSegments(chr);
+//			HelpMethods.paintEdgesGreen(chr);
+//			HelpMethods.drawImage(image);
+//			for (ArrayList<Pixel> segmentEdges : chr.getSegmentEdges()) {
+//				chr.updateChromosome();
+//				boolean point = false;
+//				
+//				for (Pixel pixel : segmentEdges) {
+//					if (chr.getRepresentation().get(pixel.getId()).getId() == pixel.getId()){
+//						point = true;
+//						break;
+//					}
+//				}
+//				if (point == false){
+//					throw new IllegalArgumentException("Chr: " + chr.getId() + " Segmentsize: " + segmentEdges.size());
+//				}
+//			}
 			//finds the biggest segment after the cut
 			ArrayList<ArrayList<Pixel>> segments = chr.getSegments();
 			int maxSegmentIndex = -1;
@@ -246,7 +262,7 @@ public class HelpMethods {
 			mapPixelsThatPointsOnPixel = createMapPixelToIndex((ArrayList<Pixel>) cuttedChromosome.clone());
 			
 			//cut the next biggest segment
-			pixelIdToCut = cutIntoTwoSegments((ArrayList<Pixel>) cuttedChromosome.clone(), pixels, mapPixelsThatPointsOnPixel, segment);
+			pixelIdToCut = cutIntoTwoSegments((ArrayList<Pixel>) cuttedChromosome.clone(), pixels, mapPixelsThatPointsOnPixel, segment, Variables.minimumSegmentSize);
 
 			long endTime = System.nanoTime();
 			long duration = endTime - startTime;
@@ -256,7 +272,7 @@ public class HelpMethods {
 	}
 	
 	//Returns the pixel id that should point to itself instead. This will be the cut.
-	public static int cutIntoTwoSegments(ArrayList<Pixel> representation, ArrayList<Pixel> pixels, HashMap<Pixel, ArrayList<Integer>> mapPixelsThatPointsOnPixel, ArrayList<Pixel> segment){
+	public static int cutIntoTwoSegments(ArrayList<Pixel> representation, ArrayList<Pixel> pixels, HashMap<Pixel, ArrayList<Integer>> mapPixelsThatPointsOnPixel, ArrayList<Pixel> segment, int minSegmentSize){
 		ArrayList<Edge> edges = generateEdgesWithMap(representation, segment, pixels, mapPixelsThatPointsOnPixel);
 		int originalSegmentSize = segment.size();
 //		for (Edge edge : edges) {
@@ -275,9 +291,12 @@ public class HelpMethods {
 		int index = 0;
 		Edge maxEdge = null;
 		while (true){
+			if (index == edges.size()){
+				return -1;
+			}
 			maxEdge = edges.get(index);
 			segmentSizes = setSegmentSizeForEachPixel(maxEdge, mapPixelsThatPointsOnPixel, pixels, originalSegmentSize);
-			if (segmentSizes[0] < Variables.minimumSegmentSize || segmentSizes[1] < Variables.minimumSegmentSize){
+			if (segmentSizes[0] < minSegmentSize || segmentSizes[1] < minSegmentSize){
 				index++;
 				continue;
 			}
@@ -457,12 +476,39 @@ public class HelpMethods {
 	}
 	
 	public static Chromosome findBestChromosome(ArrayList<Chromosome> population){
-		Chromosome bestChr = population.get(0);
-		double bestFitness = population.get(0).getFitnessValue();
+		double bestDev = Double.MAX_VALUE;
+		double bestEdge = Double.MAX_VALUE;
+		double bestConnectivity = Double.MAX_VALUE;
 		for (Chromosome chromosome : population) {
-			if (chromosome.getFitnessValue() > bestFitness){
+			if (chromosome.getDeviationFitness() < bestDev){
+				bestDev = chromosome.getDeviationFitness();
+			}
+			if (chromosome.getEdgeFitness() < bestEdge){
+				bestEdge = chromosome.getEdgeFitness();
+			}
+			if (chromosome.getConnectivityFitness() < bestConnectivity){
+				bestConnectivity = chromosome.getConnectivityFitness();
+			}
+		}
+		Chromosome bestChr = population.get(0);
+		double bestFitness = Double.MAX_VALUE;
+		for (Chromosome chromosome : population) {
+			double dev = 0;
+			double edge = 0;
+			double con = 0;
+			if (Variables.activeObjectives[0]){
+				dev = chromosome.getDeviationFitness();
+			}
+			if (Variables.activeObjectives[1]){
+				edge = chromosome.getEdgeFitness();
+			}
+			if (Variables.activeObjectives[2]){
+				con = chromosome.getConnectivityFitness();
+			}
+			double fitnessEvaluation = dev/bestDev + edge/bestEdge + con/bestConnectivity;
+			if (fitnessEvaluation < bestFitness){
 				bestChr = chromosome;
-				bestFitness = chromosome.getFitnessValue();
+				bestFitness = fitnessEvaluation;
 			}
 		}
 		return bestChr;
