@@ -226,7 +226,7 @@ public class HelpMethods {
 			long startTime = System.nanoTime();
 			
 			cuttedChromosome.set(pixelIdToCut, pixels.get(pixelIdToCut));
-			Chromosome chr = new Chromosome((ArrayList<Pixel>) cuttedChromosome.clone(), pixels, i+1, distances);
+			Chromosome chr = new Chromosome((ArrayList<Pixel>) cuttedChromosome.clone(), pixels, i+1, distances, image);
 //			Program.paintSegments(chr);
 //			HelpMethods.paintEdgesGreen(chr);
 //			HelpMethods.drawImage(image);

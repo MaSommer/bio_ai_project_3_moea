@@ -139,7 +139,7 @@ public class Program {
 			}
 		}
 		
-		Chromosome individual = new Chromosome(workingCopy, pixels, 10, distances);
+		Chromosome individual = new Chromosome(workingCopy, pixels, 10, distances, this.image);
 		
 //		int counter = 0;
 //		while(individual.getSegments().size() > maxSegments){
@@ -335,15 +335,15 @@ public class Program {
 		
 		
 		
-		this.population = HelpMethods.createPopulation(MST, pixels, image, distances);
-		for (int i = 0; i < Variables.pSize/2; i++) {
-			long startTime = System.nanoTime();
-			ArrayList<ArrayList<Pixel>> segmentedPixels = paintWithKmeans(10);
-			population.add(encode(segmentedPixels, 30, i*10));
-			long endTime = System.nanoTime();
-			long duration = endTime - startTime;
-			System.out.println("Duration: " + duration/Math.pow(10, 9) + " sec");
-		}
+//		this.population = HelpMethods.createPopulation(MST, pixels, image, distances);
+//		for (int i = 0; i < Variables.pSize/2; i++) {
+//			long startTime = System.nanoTime();
+//			ArrayList<ArrayList<Pixel>> segmentedPixels = paintWithKmeans(10);
+//			population.add(encode(segmentedPixels, 30, i*10));
+//			long endTime = System.nanoTime();
+//			long duration = endTime - startTime;
+//			System.out.println("Duration: " + duration/Math.pow(10, 9) + " sec");
+//		}
 	}
 	
 	public void run(){
@@ -392,13 +392,38 @@ public class Program {
 		return this.population;
 	}
 	
+	public ArrayList<Chromosome> generateTestImage() {
+		ArrayList<Chromosome> pop = new ArrayList<Chromosome>();
+		ArrayList<Pixel> representation = this.MST;
+		ArrayList<Pixel> segment = pixels;
+		HashMap<Pixel, ArrayList<Integer>> mapPixelsToIndex = HelpMethods.createMapPixelToIndex(representation);
+		pop.add(new Chromosome((ArrayList<Pixel>) this.MST.clone() , pixels, 1, distances, image));
+		
+		ArrayList<Edge> edges = HelpMethods.generateEdgesWithMap(representation, segment, pixels, mapPixelsToIndex);
+				
+		int pixelToCut = HelpMethods.cutIntoTwoSegments(representation, pixels, mapPixelsToIndex, segment, 1000);
+		ArrayList<Pixel> copy = (ArrayList<Pixel>) representation.clone();
+		
+		representation.set(pixelToCut, pixels.get(pixelToCut));
+		Chromosome c = new Chromosome(representation, pixels, 1, distances, image);
+		pop.add(c);
+		pop.add(new Chromosome(copy, pixels, 1, distances, image));
+		return pop;
+	}
+	
 	
 	
 	public static void main(String[] args) throws IOException {
-		String imagePath = "Test Image/1/Test image.jpg";
+		String imagePath = "Test Image/pi.jpg";
 		Program p = new Program(imagePath);
 		p.init();
-		p.run();
+		
+		ArrayList<Chromosome> pop = p.generateTestImage();
+		Chromosome c = pop.get(1);
+		c.mergeSegments(c.getSegments().get(0), c.getSegments().get(1));
+		HelpMethods.paintEdgesGreen(c);
+		HelpMethods.drawImage(p.getImage());
+//		p.run();
 
 //		p.getPopulation().get(0).updateSegmentBorder();
 //		HelpMethods.paintEdgesGreen(p.getPopulation().get(0));
