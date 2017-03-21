@@ -43,6 +43,10 @@ public class Chromosome {
 		updateFitnessParameters();
 	}
 	
+	public ArrayList<Integer> getPixelToSegment() {
+		return this.pixelToSegment;
+	}
+	
 	public void addObjectiveDistance(double distance){
 		this.fitnessValue += distance;
 	}
