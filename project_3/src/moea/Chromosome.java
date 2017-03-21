@@ -30,7 +30,7 @@ public class Chromosome {
 		segmentFitnessValues = new ArrayList<double[]>();
 		this.id = id;
 		this.pixels = pixels;
-
+		
 		decodeChromosome(pixels);
 		long startTime = System.nanoTime();
 		this.segmentEdges = HelpMethods.generateSegmentEdges(segments, pixelToSegment);
@@ -124,6 +124,10 @@ public class Chromosome {
 		}
 	}
 	
+	public ArrayList<double[]> getSegmentAvgRGBValues() {
+		return segmentAvgRGBValues;
+	}
+
 	public void mutate(){
 		int fromPixelIndex = (int) (representation.size() * Math.random());
 		Pixel fromPixel = pixels.get(fromPixelIndex);
