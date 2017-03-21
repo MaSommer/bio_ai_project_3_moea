@@ -15,6 +15,17 @@ public class Functions {
 		return Math.pow(notSquaredDev, 0.5);
 	}
 	
+	public static double pixelDeviation(double[] centeroid, Pixel p2){
+		double redDistance =centeroid[0]-p2.getRed();
+		double greenDistance = centeroid[1] - p2.getGreen();
+		double blueDistance = centeroid[2] - p2.getBlue();
+		
+		double notSquaredDev = Math.pow(redDistance, 2);
+		notSquaredDev += Math.pow(greenDistance, 2);
+		notSquaredDev += Math.pow(blueDistance, 2);
+		return Math.pow(notSquaredDev, 0.5);
+	}
+	
 	public static double pixelToPixelDeviation(Pixel p1, Pixel p2){
 		double redDistance = p1.getRed()-p2.getRed();
 		double greenDistance = p1.getGreen() - p2.getGreen();
