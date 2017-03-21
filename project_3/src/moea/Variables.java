@@ -24,7 +24,8 @@ public class Variables {
 	
 	//choose randomly between the two chromosomes if not
 	public static double selectBestChromosomeRate = 0.8;
-	
+	public static double mutationMergeRate = 0.7;
+	public static double mutationSplitRate = 0.3;
 	
 	public static double maximumDeviationValue = Math.sqrt(Math.pow(255, 2)+Math.pow(255, 2)+Math.pow(255, 2));
 	public static double minimumDeviationValue = 0;
@@ -33,11 +34,8 @@ public class Variables {
 	public static double maximumConnectivityValue = (1 + 1/2 + 1/3 + 1/4);
 	public static double minimumConnectivityValue = 0;
 	
-<<<<<<< HEAD
 	public static int numberOfGenerations = 50;
-=======
-	public static int numberOfGenerations = 30;
->>>>>>> master
+
 
 	//Crossover variable
 	public static double mixingRate = 0.5;

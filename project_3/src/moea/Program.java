@@ -111,9 +111,9 @@ public class Program {
 			}
 			segmentedPixels.get(index).add(p);
 		}
-		for(double[] neuron:neurons){
-			System.out.println(Arrays.toString(neuron));
-		}
+//		for(double[] neuron:neurons){
+//			System.out.println(Arrays.toString(neuron));
+//		}
 		return segmentedPixels;
 			
 	}
@@ -321,19 +321,29 @@ public class Program {
 		this.image = HelpMethods.generateImage(pixels1);
 		setDistances();
 		createMST();
-
-		this.population = HelpMethods.createPopulationImproved(MST, pSize, pixels);
+		
+		
+		
+		this.population = HelpMethods.createPopulationImproved(MST, pixels);
+		for (int i = 0; i < Variables.pSize/2; i++) {
+			long startTime = System.nanoTime();
+			ArrayList<ArrayList<Pixel>> segmentedPixels = paintWithKmeans(10);
+			population.add(encode(segmentedPixels, 30, i*10));
+			long endTime = System.nanoTime();
+			long duration = endTime - startTime;
+			System.out.println("Duration: " + duration/Math.pow(10, 9) + " sec");
+		}
 	}
 	
 	public void run(){
 		long startTime = System.nanoTime();
 		int generations = 1;
 		//do some mutations
-		for (int i = 0; i < 1000; i++) {
-			for (Chromosome chromosome : population) {
-				chromosome.mutate();
-			}
-		}
+//		for (int i = 0; i < 1000; i++) {
+//			for (Chromosome chromosome : population) {
+//				chromosome.mutate();
+//			}
+//		}
 		for (int i = 0; i < Variables.numberOfGenerations; i++) {
 			ArrayList<Chromosome> selectedPopulation = Nsga2Operations.selection(population);
 			population = HelpMethods.crossover(selectedPopulation, pixels);
@@ -346,7 +356,19 @@ public class Program {
 			}
 			generations++;
 		}
-		HelpMethods.paintEdgesGreen(HelpMethods.findBestChromosome(population));
+		HashMap<Integer, ArrayList<Chromosome>> frontierMap = Nsga2Operations.fastNonDominatedSort(population);
+		ArrayList<Chromosome> frontier1 = frontierMap.get(1);
+		for(Chromosome chr: frontier1){
+			Chromosome solution = chr;
+			int counter = 0;
+			while(solution.getSegments().size() > 30 && counter < 100){
+				solution.removeSmallSegments(70);
+				counter++;
+			}
+			solution.updateChromosome();
+		}
+		
+		HelpMethods.paintEdgesGreen(HelpMethods.findBestChromosome(frontier1));
 		HelpMethods.drawImage(image);
 	}
 	
@@ -364,10 +386,11 @@ public class Program {
 		String imagePath = "Test Image/1/Test Image.jpg";
 		Program p = new Program(imagePath);
 		p.init();
+		p.run();
 
-		p.getPopulation().get(0).updateSegmentBorder();
-		HelpMethods.paintEdgesGreen(p.getPopulation().get(0));
-		HelpMethods.drawImage(p.getImage());
+//		p.getPopulation().get(0).updateSegmentBorder();
+//		HelpMethods.paintEdgesGreen(p.getPopulation().get(0));
+//		HelpMethods.drawImage(p.getImage());
 
 //		HelpMethods.paintEdgesGreen(p.getPopulation().get(0));
 //		HelpMethods.drawImage(p.getImage());
@@ -376,7 +399,6 @@ public class Program {
 //		p.createMST();
 		
 //		
-//		p.run();
 	}
 
 }

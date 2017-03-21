@@ -35,6 +35,36 @@ public class Nsga2Operations {
 	}
 	
 	
+	public static ArrayList<Chromosome> crossover(ArrayList<Chromosome> population){
+		
+		return population;
+	}
+	
+	public static Chromosome mutation(Chromosome chromosome){
+		double random = Math.random();
+		
+		if (random < Variables.mutationMergeRate){
+			
+		}
+		else{
+			
+		}
+		return chromosome;
+	}
+	
+	public static Chromosome mutationMerge(Chromosome chromosome){
+		
+		
+		return chromosome;
+	}
+	
+	public static Chromosome mutationSplit(Chromosome chromosome){
+		
+		
+		return chromosome;
+	}
+	
+	
 	public static void crowdingDistanceAssignment(HashMap<Integer, ArrayList<Chromosome>> frontierMap){
 		Iterator it = frontierMap.entrySet().iterator();
 		while (it.hasNext()) {
