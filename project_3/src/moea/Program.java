@@ -380,6 +380,7 @@ public class Program {
 		long totalEndtime = System.nanoTime();
 		long duration = (long) ((totalEndtime - totalStartTime)/Math.pow(10, 9));
 		HelpMethods.paintEdgesGreen(best);
+		HelpMethods.drawImage(best, duration);
 		best.paintPixelsGroundTruth();
 		HelpMethods.drawImage(best, duration);
 	}
@@ -414,10 +415,9 @@ public class Program {
 	
 	
 	public static void main(String[] args) throws IOException {
-		String imagePath = "Test Image/3/Test image.jpg";
+		String imagePath = "Test Image/1/Test image.jpg";
 		Program p = new Program(imagePath);
 		p.init();
-		System.out.println("Comes past init");
 		p.run();
 //		Chromosome chr1 = HelpMethods.initializeChromosome(80, p.MST, p.pixels, p.image, p.distances);
 //		while (chr1.getSegments().size() > Variables.optimalNumberOfSegments){

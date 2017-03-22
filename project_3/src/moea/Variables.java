@@ -6,7 +6,7 @@ public class Variables {
 	public static int maxSegments = 10;
 	public static int minPixelsInSegment = 10;
 	public static int pSize = 30;
-	public static int numberOfGenerations = 40;
+	public static int numberOfGenerations = 30;
 	
 	//{active deviation, active edgevalue, active connectivity}
 	public static boolean[] activeObjectives = {true, true, true};
@@ -24,11 +24,11 @@ public class Variables {
 	//Crossover variable
 	public static double mixingRate = 0.5;
 	
-	public static int minimumSegmentSize = 40;
+	public static int minimumSegmentSize = 300;
 
 	public static int maxmimumSegmentSizeForMutationMerge = 1000;
 	
-	public static int numberOfFirstInitializingCut = 25;
+	public static int numberOfFirstInitializingCut = 20;
 	
 	public static int optimalNumberOfSegments = 12;
 }
