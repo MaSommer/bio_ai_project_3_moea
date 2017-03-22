@@ -36,108 +36,64 @@ public class Nsga2Operations {
 	}
 
 
-	public static ArrayList<Chromosome> crossover(ArrayList<Chromosome> population){
-
+	public static ArrayList<Chromosome> crossover(ArrayList<Chromosome> selectedPopulation, ArrayList<Pixel> pixels){
+		ArrayList<Chromosome> population = new ArrayList<Chromosome>();
+		while(population.size() < Variables.pSize){
+			for(int i = 0 ; i < selectedPopulation.size()-1; i+=2){
+				Chromosome chr1 = selectedPopulation.get(i);
+				Chromosome chr2 = selectedPopulation.get(i+1);
+				double random = Math.random();
+				if (random < Variables.crossoverRate){
+					ArrayList<Chromosome> children = generateOffsprings(chr1, chr2, Variables.mixingRate, pixels);
+					population.addAll(children);					
+				}
+				else{
+					population.add(chr1);					
+					population.add(chr2);					
+				}
+				
+			}
+			Collections.shuffle(selectedPopulation);
+		}
+//		selectedPopulation = population;
 		return population;
 	}
 	
-
-//	public ArrayList<Chromosome> singleCrossover(Chromosome chr1, Chromosome chr2){
-//		Chromosome child1 = new Chromosome(chr1);
-//		Chromosome child2 = new Chromosome(chr2);
-//		ArrayList<Chromosome> children = new ArrayList<Chromosome>();
-//		
-//		children.add(child1);
-//		children.add(child2);
-//		
-//		//select pixel to look at
-//		int pixelIndex = (int) Math.random() * chr1.getRepresentation().size();
-//		
-//		//Find segment ids of the selected pixel in each chromosome
-//		int segment1Index = child1.getPixelToSegment().get(pixelIndex);
-//		int segment2Index = child2.getPixelToSegment().get(pixelIndex);
-//		
-//		//Find the segments
-//		ArrayList<Pixel> segment1 = child1.getSegments().get(segment1Index);
-//		ArrayList<Pixel> segment2 = child2.getSegments().get(segment2Index);
-//		
-//		ArrayList<Pixel> toBeInsertedAgain = new ArrayList<Pixel>();
-//		//Find Pixels that are in both segments
-//		ArrayList<double[]> c1RGB = child1.getSegmentAvgRGBValues();
-//		ArrayList<double[]> c2RGB = child2.getSegmentAvgRGBValues();
-//		
-//		//take RGB to totals instead of averages
-//		for(int i = 0 ; i < 3 ; i++){
-//			c1RGB.get(segment1Index)[i] = c1RGB.get(segment1Index)[i] * segment1.size();
-//			c2RGB.get(segment2Index)[i] = c2RGB.get(segment2Index)[i] * segment2.size();
-//		}
-//		
-//		//Find common pixels in both segments, remove RGB contribution of selected pixels
-//		for(Pixel p: segment1){
-//			if(segment2.contains(p)){
-//				toBeInsertedAgain.add(p);
-//				c1RGB.get(segment1Index)[0] -= p.getRed();
-//				c1RGB.get(segment1Index)[1] -= p.getGreen();
-//				c1RGB.get(segment1Index)[2] -= p.getBlue();
-//				c2RGB.get(segment2Index)[0] -= p.getRed();
-//				c2RGB.get(segment2Index)[1] -= p.getGreen();
-//				c2RGB.get(segment2Index)[2] -= p.getBlue();
-//				
-//			}
-//		}
-//		
-//		//update average RGB with the new size of the segments
-//		for(int i = 0 ; i < 3 ; i++){
-//			c1RGB.get(segment1Index)[i] = c1RGB.get(segment1Index)[i] / (segment1.size()-toBeInsertedAgain.size());
-//			c2RGB.get(segment2Index)[i] = c2RGB.get(segment2Index)[i] / (segment2.size() - toBeInsertedAgain.size());
-//		}
-//		
-//		ArrayList<Pixel> child1Repr = child1.getRepresentation();
-//		ArrayList<Pixel> child2Repr = child2.getRepresentation();
-//		//Set all pointers from the selected pixels equal to null and 
-//		for(Pixel p: toBeInsertedAgain){
-//			int id = p.getId();
-//			child1Repr.set(p.getId(), null);
-//			child2Repr.set(p.getId(), null);
-//		}
-//		//Find those pixels that are on the edge and add these edges to a priorityQueue
-//		Comparator<Edge> edgeComparator = new Comparator<Edge>() {
-//			public int compare(Edge e1, Edge e2){
-//				if (e1.getWeight() > e2.getWeight()){
-//					return 1;
-//				}
-//				else if (e1.getWeight() < e2.getWeight()){
-//					return -1;
-//				}
-//				else {
-//					return 0;
-//				}
-//			}
-//		};
-//		PriorityQueue<Edge> edgesFrom1 = new PriorityQueue<Edge>(10, edgeComparator);
-//		PriorityQueue<Edge> edgesFrom2 = new PriorityQueue<Edge>(10, edgeComparator);
-//		
-//		for(Pixel p: toBeInsertedAgain){
-//			ArrayList<Pixel> neighbours = p.getNeighbours();
-//			ArrayList<Double> neighbourDistances = p.getNeighbourDistances();
-//			for(int i = 0 ; i < neighbours.size() ; i++){
-//				if(!toBeInsertedAgain.contains(neighbours.get(i))){
-//					int neighbour1Segment = child1.getPixelToSegment().get(neighbours.get(i).getId());
-//					int neighbour2Segment = child2.getPixelToSegment().get(neighbours.get(i).getId());
-//					double neighbour1Dev = Functions.pixelDeviation(c1RGB.get(neighbour1Segment), p);
-//					double neighbour2Dev = Functions.pixelDeviation(c2RGB.get(neighbour2Segment), p);
-//					neighbour1Dev += neighbourDistances.get(i);
-//					neighbour2Dev += neighbourDistances.get(i);
-//					Edge newEdge1 = new Edge(p, neighbours.get(i), neighbour1Dev);
-//					
-//				}
-//			}
-//		}
-//		
-//	
-//		
-//	}
+	private static ArrayList<Chromosome> generateOffsprings(Chromosome chr1, Chromosome chr2, double mixingRate, ArrayList<Pixel> pixels){
+		ArrayList<Chromosome> offSprings = new ArrayList<Chromosome>();
+		ArrayList<Pixel> representation1 = chr1.getRepresentation();
+		ArrayList<Pixel> representation2 = chr2.getRepresentation();
+		for(int i = 0 ; i < representation1.size() ; i++){
+			if(Math.random() < mixingRate){
+				int swap1index = representation1.get(i).getId();
+				int swap2index = representation2.get(i).getId();
+				
+				representation2.set(i, pixels.get(swap1index));
+				representation1.set(i, pixels.get(swap2index));
+			}
+			
+		}
+		chr1.updateChromosome();
+		chr2.updateChromosome();
+		for (ArrayList<Pixel> segment : chr1.getSegments()) {
+			if (segment.size() < Variables.minimumSegmentSize){
+				mutationMergeSmallest(chr1, pixels);
+			}
+		}
+		for (ArrayList<Pixel> segment : chr2.getSegments()) {
+			if (segment.size() < Variables.minimumSegmentSize){
+				mutationMergeSmallest(chr2, pixels);
+			}
+		}
+		chr1.updateChromosome();
+		chr2.updateChromosome();		
+		offSprings.add(chr1);
+		offSprings.add(chr2);
+		
+		return offSprings;
+	}
 	
+
 
 	public static void mutation(ArrayList<Chromosome> population, ArrayList<Pixel> pixels){
 		double random = Math.random();
@@ -268,33 +224,6 @@ public class Nsga2Operations {
 		ArrayList<Pixel> segment1 = segments.get(choice);
 		ArrayList<Pixel> segment2 = segments.get(bestSegmentToMerge);
 		chromosome.mergeSegments(segment1, segment2);
-//		boolean point = false;
-//		for (Pixel p : segments.get(randomSegment)) {
-//			if (representation.get(p.getId()).getId() == p.getId()){
-//				point = true;
-//				//				System.out.println(point);
-//			}
-//		}
-//		if (pixelToMerge == -1){
-//			return;
-//		}
-//		int bestNeighbourToMerge = -1;
-//		double bestEdgeValue = Double.POSITIVE_INFINITY;
-//
-//		//choose to merge with the lowest edge value 
-//		for (Pixel neighbour : pixels.get(pixelToMerge).getNeighbours()) {
-//			int neighbourSegment = chromosome.getPixelToSegment().get(neighbour.getId());
-//			double edgeValue = Functions.pixelToPixelDeviation(pixels.get(pixelToMerge), neighbour);
-//			if (edgeValue < bestEdgeValue && neighbourSegment != chromosome.getPixelToSegment().get(pixelToMerge) && bestSegmentToMerge == neighbourSegment){
-//				bestEdgeValue = edgeValue;
-//				bestNeighbourToMerge = neighbour.getId();
-//			}
-//		}
-//		if (pixelToMerge != -1 && neighbourPixelToMerge != -1 && bestRGBDistace < 50){
-//			chromosome.getRepresentation().set(pixelToMerge, pixels.get(bestNeighbourToMerge));
-//			chromosome.updateChromosome();
-//		}
-
 	}
 
 	public static void mutationSplit(Chromosome chromosome, ArrayList<Pixel> pixels){
@@ -390,9 +319,6 @@ public class Nsga2Operations {
 			}
 		}
 	}
-
-
-
 
 	public static HashMap<Integer,ArrayList<Chromosome>> fastNonDominatedSort(ArrayList<Chromosome> population){
 		HashMap<Integer,ArrayList<Chromosome>> frontiers = new HashMap<Integer,ArrayList<Chromosome>>();

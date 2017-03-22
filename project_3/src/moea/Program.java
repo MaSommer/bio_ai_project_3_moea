@@ -367,7 +367,7 @@ public class Program {
 		int generations = 1;
 		for (int i = 0; i < Variables.numberOfGenerations; i++) {
 			population = Nsga2Operations.selection(population);
-//			population = HelpMethods.crossover(selectedPopulation, pixels);
+			population = Nsga2Operations.crossover(population, pixels);
 			Nsga2Operations.mutation(population, pixels);
 			
 			long endTime = System.nanoTime();

@@ -18,7 +18,7 @@ public class Variables {
 	public static double mutationMergeSmallesRate = 0.05;
 	public static double mutationMergeAllCombinationsRate = 0.95;
 	public static double mutationSplitRate = 0;
-	public static double crossoverRate = 0;
+	public static double crossoverRate = 0.01;
 	
 
 
