@@ -74,7 +74,7 @@ public class Program {
 		return Math.pow(redDist+blueDist+greenDist, 0.5);
 	}
 	
-	public ArrayList<ArrayList<Pixel>> paintWithKmeans(int segments){
+	public ArrayList<ArrayList<Pixel>> segmentWithKmeans(int segments){
 		double[][] neurons = new double[segments][3];
 		double red = 0;
 		double blue = 0;
@@ -380,7 +380,8 @@ public class Program {
 		long totalEndtime = System.nanoTime();
 		long duration = (long) ((totalEndtime - totalStartTime)/Math.pow(10, 9));
 		HelpMethods.paintEdgesGreen(best);
-		HelpMethods.drawImage(image, best.getSegments(), duration);
+		best.paintPixelsGroundTruth();
+		HelpMethods.drawImage(best, duration);
 	}
 	
 	public ArrayList<ArrayList<Pixel>> getImage() {
@@ -416,6 +417,7 @@ public class Program {
 		String imagePath = "Test Image/3/Test image.jpg";
 		Program p = new Program(imagePath);
 		p.init();
+		System.out.println("Comes past init");
 		p.run();
 //		Chromosome chr1 = HelpMethods.initializeChromosome(80, p.MST, p.pixels, p.image, p.distances);
 //		while (chr1.getSegments().size() > Variables.optimalNumberOfSegments){

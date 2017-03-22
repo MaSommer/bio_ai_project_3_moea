@@ -20,6 +20,11 @@ public class Chromosome {
 	private ArrayList<Pixel> pixels;
 
 	private double deviationFitness;
+	public ArrayList<ArrayList<Pixel>> getImage() {
+		return image;
+	}
+
+
 	private double edgeFitness;
 	private double connectivityFitness;
 	private ArrayList<double[]> distances;
@@ -70,6 +75,21 @@ public class Chromosome {
 		this.connectivityFitness = copy.connectivityFitness;
 		this.pixels = copy.pixels;
 		this.image = copy.image;
+	}
+	
+	public void paintPixelsGroundTruth(){
+		int[] white = {255,255,255};
+		for(Pixel p: pixels){
+			p.clearPaint();
+			p.setColor(white);
+		}
+		
+		for(ArrayList<Pixel> segmentBorder: this.segmentEdges){
+			int[] black = {0,0,0};
+			for(Pixel p:segmentBorder){	
+				p.setColor(black);
+			}
+		}
 	}
 	
 	public static ArrayList<Chromosome> testFrontierChromosomes(){
