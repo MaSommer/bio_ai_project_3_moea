@@ -10,6 +10,7 @@ public class Variables {
 	
 	//{active deviation, active edgevalue, active connectivity}
 	public static boolean[] activeObjectives = {true, false, true};
+
 	
 	//choose randomly between the two chromosomes if not
 	public static double selectBestChromosomeRate = 0.8;
@@ -25,9 +26,9 @@ public class Variables {
 	public static double mixingRate = 0.5;
 	
 	public static int minimumSegmentSize = 750;
-	public static int maxmimumSegmentSizeForMutationMerge = 50;
+
+	public static int maxmimumSegmentSizeForMutationMerge = 1000;
 	
-	public static int numberOfFirstInitializingCut =40;
-	
-	public static int optimalNumberOfSegments = 8;
+	public static int numberOfFirstInitializingCut = 40;
+
 }
