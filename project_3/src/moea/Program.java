@@ -381,8 +381,6 @@ public class Program {
 		long duration = (long) ((totalEndtime - totalStartTime)/Math.pow(10, 9));
 		HelpMethods.paintEdgesGreen(best);
 		HelpMethods.drawImage(best, duration);
-		best.paintPixelsGroundTruth();
-		HelpMethods.drawImage(best, duration);
 	}
 	
 	public ArrayList<ArrayList<Pixel>> getImage() {
