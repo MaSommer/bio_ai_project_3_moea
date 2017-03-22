@@ -381,6 +381,8 @@ public class Program {
 		long duration = (long) ((totalEndtime - totalStartTime)/Math.pow(10, 9));
 		HelpMethods.paintEdgesGreen(best);
 		HelpMethods.drawImage(image, best.getSegments(), duration);
+		best.paintGroundTruth();
+		HelpMethods.drawImage(image, best.getSegments(), duration);
 	}
 	
 	public ArrayList<ArrayList<Pixel>> getImage() {
@@ -413,7 +415,7 @@ public class Program {
 	
 	
 	public static void main(String[] args) throws IOException {
-		String imagePath = "Test Image/1/Test image.jpg";
+		String imagePath = "Test Image/pi.png";
 		Program p = new Program(imagePath);
 		p.init();
 		p.run();

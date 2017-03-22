@@ -341,6 +341,10 @@ public class HelpMethods {
 	
 	
 	public static void paintEdgesGreen(Chromosome chromosome){
+		for(Pixel p: chromosome.getPixels()){
+			p.removePaint();
+		}
+		
 		for (ArrayList<Pixel> segmentEdges : chromosome.getSegmentEdges()) {
 			for (Pixel pixel : segmentEdges) {
 				pixel.paintGreen();

@@ -101,6 +101,27 @@ public class Chromosome {
 		}
 		return pop;
 	}
+	
+	public ArrayList<Pixel> getPixels(){
+		return this.pixels;
+	}
+	
+	public void paintGroundTruth(){
+		int[] white = {255,255,255};
+		int[] black = {0,0,0};
+		
+		for(Pixel p: pixels){
+			p.removePaint();
+			p.setColor(white);
+		}
+		
+		for(ArrayList<Pixel> segmentEdge: segmentEdges){
+			for(Pixel p: segmentEdge){
+				p.removePaint();
+				p.setColor(black);
+			}
+		}
+	}
 
 	public void setDeviationFitness(double deviationFitness) {
 		this.deviationFitness = deviationFitness;

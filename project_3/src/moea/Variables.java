@@ -25,9 +25,9 @@ public class Variables {
 	public static double mixingRate = 0.5;
 	
 	public static int minimumSegmentSize = 300;
-	public static int maxmimumSegmentSizeForMutationMerge = 1000;
+	public static int maxmimumSegmentSizeForMutationMerge = 50;
 	
-	public static int numberOfFirstInitializingCut = 50;
+	public static int numberOfFirstInitializingCut =20;
 	
-	public static int optimalNumberOfSegments = 20;
+	public static int optimalNumberOfSegments = 2;
 }
