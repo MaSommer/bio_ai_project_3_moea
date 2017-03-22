@@ -16,14 +16,11 @@ public class DrawImage extends JFrame{
 	private JPanel panel;
 	private ArrayList<ArrayList<Pixel>> segments;
 	private long duration;
-	private Chromosome chr;
 
-	public DrawImage(Chromosome chr, long duration){
+	public DrawImage(ArrayList<ArrayList<Pixel>> pixels, ArrayList<ArrayList<Pixel>> segments, long duration){
 		panel = new JPanel();
-		this.chr = chr;
-		this.segments = chr.getSegments();
+		this.segments = segments;
 		this.duration = duration;
-		ArrayList<ArrayList<Pixel>> pixels = chr.getImage();
 		getContentPane().add( panel );
 		int height = pixels.size();
 		int width = pixels.get(0).size();
@@ -73,7 +70,5 @@ public class DrawImage extends JFrame{
 		add(label);
 		return label;
 	}
-	
-	
 
 }

@@ -135,8 +135,8 @@ public class HelpMethods {
 		return image;
 	}
 
-	public static void drawImage(Chromosome chr, long duration){
-		JFrame frame = new DrawImage(chr, duration);
+	public static void drawImage(ArrayList<ArrayList<Pixel>> pixels, ArrayList<ArrayList<Pixel>> segments, long duration){
+		JFrame frame = new DrawImage(pixels, segments, duration);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.pack();
 		frame.setLocationRelativeTo( null );

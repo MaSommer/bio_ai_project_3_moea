@@ -11,9 +11,6 @@ public class Pixel {
 	private int alpha;
 	private int id;
 	private boolean hasAlphaChannel;
-	private int redPaint;
-	private int greenPaint;
-	private int bluePaint;
 
 	private ArrayList<Pixel> neighbours;
 
@@ -37,11 +34,7 @@ public class Pixel {
 	}
 	
 	public int getRed() {
-		if(redPaint == red)
-			return red;
-		else{
-			return redPaint;
-		}
+		return red;
 	}
 	
 	public ArrayList<Pixel> getNeighbours() {
@@ -60,25 +53,11 @@ public class Pixel {
 	}
 
 	public int getGreen() {
-		if(greenPaint == green)
-			return green;
-		else{
-			return greenPaint;
-		}
-	}
-	
-	public void clearPaint() {
-		redPaint = red;
-		greenPaint = green;
-		bluePaint = blue;
+		return green;
 	}
 
 	public int getBlue() {
-		if(bluePaint == blue)
-			return blue;
-		else{
-			return bluePaint;
-		}
+		return blue;
 	}
 
 	
@@ -104,15 +83,15 @@ public class Pixel {
 	}
 	
 	public void paintGreen(){
-		this.redPaint = 21;
-		this.greenPaint = 250;
-		this.bluePaint = 4;
+		this.red = 21;
+		this.green = 250;
+		this.blue = 4;
 	}
 	
 	public void setColor(int[] rgb){
-		this.redPaint = rgb[0];
-		this.greenPaint = rgb[1];
-		this.bluePaint = rgb[2];
+		this.red = rgb[0];
+		this.green = rgb[1];
+		this.blue = rgb[2];
 	}
 	
 //	public String toString(){

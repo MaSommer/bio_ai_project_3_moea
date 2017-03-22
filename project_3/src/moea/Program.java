@@ -74,7 +74,7 @@ public class Program {
 		return Math.pow(redDist+blueDist+greenDist, 0.5);
 	}
 	
-	public ArrayList<ArrayList<Pixel>> segmentWithKmeans(int segments){
+	public ArrayList<ArrayList<Pixel>> paintWithKmeans(int segments){
 		double[][] neurons = new double[segments][3];
 		double red = 0;
 		double blue = 0;
@@ -380,7 +380,8 @@ public class Program {
 		long totalEndtime = System.nanoTime();
 		long duration = (long) ((totalEndtime - totalStartTime)/Math.pow(10, 9));
 		HelpMethods.paintEdgesGreen(best);
-		HelpMethods.drawImage(best, duration);
+		HelpMethods.drawImage(image, best.getSegments(), duration);
+
 	}
 	
 	public ArrayList<ArrayList<Pixel>> getImage() {
