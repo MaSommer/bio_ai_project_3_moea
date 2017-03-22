@@ -135,8 +135,8 @@ public class HelpMethods {
 		return image;
 	}
 
-	public static void drawImage(ArrayList<ArrayList<Pixel>> pixels){
-		JFrame frame = new DrawImage(pixels);
+	public static void drawImage(ArrayList<ArrayList<Pixel>> pixels, ArrayList<ArrayList<Pixel>> segments, long duration){
+		JFrame frame = new DrawImage(pixels, segments, duration);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.pack();
 		frame.setLocationRelativeTo( null );
@@ -214,28 +214,12 @@ public class HelpMethods {
 		ArrayList<Pixel> cuttedChromosome = (ArrayList<Pixel>) pixelsMST.clone();
 		HashMap<Pixel, ArrayList<Integer>> mapPixelsThatPointsOnPixel = createMapPixelToIndex((ArrayList<Pixel>) pixelsMST.clone());
 		int pixelIdToCut = cutIntoTwoSegments(pixelsMST, pixels, mapPixelsThatPointsOnPixel, pixels, Variables.minimumSegmentSize);
-		for (int i = 0; i < Variables.pSize/2+20; i++) {
+		for (int i = 0; i < Variables.pSize+Variables.numberOfFirstInitializingCut; i++) {
 			long startTime = System.nanoTime();
 			
 			cuttedChromosome.set(pixelIdToCut, pixels.get(pixelIdToCut));
 			Chromosome chr = new Chromosome((ArrayList<Pixel>) cuttedChromosome.clone(), pixels, i+1, distances, image);
-//			Program.paintSegments(chr);
-//			HelpMethods.paintEdgesGreen(chr);
-//			HelpMethods.drawImage(image);
-//			for (ArrayList<Pixel> segmentEdges : chr.getSegmentEdges()) {
-//				chr.updateChromosome();
-//				boolean point = false;
-//				
-//				for (Pixel pixel : segmentEdges) {
-//					if (chr.getRepresentation().get(pixel.getId()).getId() == pixel.getId()){
-//						point = true;
-//						break;
-//					}
-//				}
-//				if (point == false){
-//					throw new IllegalArgumentException("Chr: " + chr.getId() + " Segmentsize: " + segmentEdges.size());
-//				}
-//			}
+
 			//finds the biggest segment after the cut
 			ArrayList<ArrayList<Pixel>> segments = chr.getSegments();
 			int maxSegmentIndex = -1;
@@ -248,7 +232,7 @@ public class HelpMethods {
 			}
 			ArrayList<Pixel> segment = segments.get(maxSegmentIndex);
 			
-			if (i > 20){
+			if (i > Variables.numberOfFirstInitializingCut){
 				population.add(chr);				
 			}
 			mapPixelsThatPointsOnPixel = createMapPixelToIndex((ArrayList<Pixel>) cuttedChromosome.clone());
@@ -513,6 +497,36 @@ public class HelpMethods {
 				chromosome.updateChromosome();
 			}
 		}
+	}
+	
+	public static Chromosome initializeChromosome(int numberOfSegments, ArrayList<Pixel> pixelsMST, ArrayList<Pixel> pixels, ArrayList<ArrayList<Pixel>> image, ArrayList<double[]> distances){
+		ArrayList<Pixel> cuttedChromosome = (ArrayList<Pixel>) pixelsMST.clone();
+		HashMap<Pixel, ArrayList<Integer>> mapPixelsThatPointsOnPixel = createMapPixelToIndex((ArrayList<Pixel>) pixelsMST.clone());
+		int pixelIdToCut = cutIntoTwoSegments(pixelsMST, pixels, mapPixelsThatPointsOnPixel, pixels, Variables.minimumSegmentSize);
+		for (int i = 0; i < numberOfSegments; i++) {
+			cuttedChromosome.set(pixelIdToCut, pixels.get(pixelIdToCut));
+			
+			Chromosome chr = new Chromosome((ArrayList<Pixel>) cuttedChromosome.clone(), pixels, 0, distances, image);
+			//finds the biggest segment after the cut
+			ArrayList<ArrayList<Pixel>> segments = chr.getSegments();
+			int maxSegmentIndex = -1;
+			int maxSegmentSize = Integer.MIN_VALUE;
+			for (int j = 0; j < segments.size(); j++) {
+				if (segments.get(j).size() > maxSegmentSize){
+					maxSegmentSize = segments.get(j).size();
+					maxSegmentIndex = j;
+				}
+			}
+			ArrayList<Pixel> segment = segments.get(maxSegmentIndex);
+
+			mapPixelsThatPointsOnPixel = createMapPixelToIndex((ArrayList<Pixel>) cuttedChromosome.clone());
+			
+			//cut the next biggest segment
+			pixelIdToCut = cutIntoTwoSegments((ArrayList<Pixel>) cuttedChromosome.clone(), pixels, mapPixelsThatPointsOnPixel, segment, Variables.minimumSegmentSize);
+
+
+		}
+		return new Chromosome((ArrayList<Pixel>) cuttedChromosome.clone(), pixels, 0, distances, image);
 	}
 	
 	
