@@ -267,36 +267,54 @@ public class Chromosome {
 	
 	public void removeSmallSegments( int minSize){
 		for(ArrayList<Pixel> segment: this.segments){
+			
 			if(segment.size() < minSize){
+				
+				Pixel minPointerOtherSeg = null;
+				Pixel minPointerThisSeg = null;
+				Pixel pointsToOther = null;
+				Pixel pointsToThisSeg = null;
+				double minDistThisSeg = 1000;
+				double minDistOtherSeg = 1000;
+				
 				for(Pixel p:segment){
+					boolean pointsToItself = (p.getId() == representation.get(p.getId()).getId());
 					ArrayList<Pixel> borderPixels = new ArrayList<Pixel>();
-					for(Pixel n:p.getNeighbours()){
-						if(!segment.contains(n)){
-							borderPixels.add(n);
-						}
-					}
-					if(borderPixels.size() == 0){
-						continue;
-					}
-					else{
-						double minDistance = 10000;
-						Pixel minPointer = null;
-						for(Pixel b:borderPixels){
-							double dist = p.getDistance(b);
-							if(dist<minDistance){
-								minDistance = dist;
-								minPointer = b;
+					for(Pixel n : p.getNeighbours()){
+						boolean pointsToItselfOther = (representation.get(n.getId()).getId() == n.getId());
+						if(pointsToItselfOther  || pointsToItself){ //Only worth looking at if it points at itself
+							if(!segment.contains(n)){ //Only worth looking at if it is outside the segment
+								double dist = Functions.pixelToPixelDeviation(p, n);
+								if(pointsToItselfOther && dist <= minDistOtherSeg){
+									minPointerOtherSeg = n;
+									minDistOtherSeg = dist;
+									pointsToOther = p;
+									
+								}
+								if(pointsToItself && dist <= minDistThisSeg ){
+									minPointerThisSeg = p;
+									minDistThisSeg = dist;
+									pointsToThisSeg = n;
+								}
+								
 							}
+							
+							
 						}
-						this.representation.set(p.getId(), minPointer);
-						break;
-					}	
+					}
+				}
+				if(minDistThisSeg < 1000){
+					representation.set(minPointerThisSeg.getId(), pointsToThisSeg);
+				}
+				else if(minDistOtherSeg < 1000){
+					representation.set(minPointerOtherSeg.getId(), pointsToOther);
+				}
+				else{
+					continue;
 				}
 			}
 		}
-//		System.out.println("Number of segments: " + segments.size());
-		decodeChromosome(pixels);
-		
+		updateChromosome();
 	}
 	
 	public void mergeSegments(ArrayList<Pixel> segment1, ArrayList<Pixel> segment2){
@@ -353,7 +371,7 @@ public class Chromosome {
 						fromPixelIndex = currentPixel- 1; //WEST
 					}
 					Pixel fromPixel = pixels.get(fromPixelIndex);
-					Pixel toPixel = pixels.get(currentPixel);
+					Pixel toPixel = pixels.get(toPixelIndex);
 					
 					if(representation.get(fromPixelIndex) == null){
 						currentPixelsEdges.add(new Edge(fromPixel, toPixel, distance));
@@ -366,7 +384,6 @@ public class Chromosome {
 			}
 			while(true){
 				Edge e = edges.poll();
-				
 				if(representation.get(e.getFrom().getId()) == null){
 //					System.out.println("Used edge: " + e);
 					Pixel fromPixel = e.getFrom();
@@ -376,7 +393,6 @@ public class Chromosome {
 					currentPixel = fromPixel.getId();
 					break;
 				}
-
 			}
 		}
 		updateChromosome();

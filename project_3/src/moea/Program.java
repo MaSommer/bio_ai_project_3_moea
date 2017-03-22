@@ -15,6 +15,8 @@ public class Program {
 	private ArrayList<Chromosome> population;
 	private ArrayList<ArrayList<Pixel>> image;
 	
+	private long totalStartTime;
+	
 	//Key: pixel id, Value: the pixels that point
 	private int pSize;
 	private String imagePath;
@@ -47,6 +49,7 @@ public class Program {
 	
 	public Program(String imagePath) {
 		super();
+		this.totalStartTime = System.nanoTime();
 		this.pSize = Variables.pSize;
 		this.image = new ArrayList<ArrayList<Pixel>>();
 		this.pixels = new ArrayList<Pixel>();
@@ -128,8 +131,10 @@ public class Program {
 			
 	}
 	
-	public Chromosome encode(ArrayList<ArrayList<Pixel>> segmentedPixels, int maxSegments, int maxSegmentSize){
+	public Chromosome encode(ArrayList<ArrayList<Pixel>> segmentedPixels, int id){
 		ArrayList<Pixel> workingCopy = (ArrayList<Pixel>) MST.clone();
+		
+		
 		for(ArrayList<Pixel> segment: segmentedPixels){
 			for(Pixel p: segment){
 				Pixel pointsTo = MST.get(p.getId());
@@ -139,16 +144,18 @@ public class Program {
 			}
 		}
 		
-		Chromosome individual = new Chromosome(workingCopy, pixels, 10, distances, this.image);
-		
-		int counter = 0;
-		while(individual.getSegments().size() > maxSegments){
-			individual.removeSmallSegments(maxSegmentSize);
-			counter ++;
-			if(counter == 100){
-				break;
-			}
+		if(workingCopy.contains(null)){
+			System.out.println("SKADA");
 		}
+		
+		Chromosome individual = new Chromosome(workingCopy, pixels, id, distances, this.image);
+		if(individual.getRepresentation().contains(null)){
+			System.out.println("Bullshiot");
+		}
+		int counter = 0;
+//		while(individual.getSegments().size() > Variables.optimalNumberOfSegments){
+//			Nsga2Operations.mutation(individual, pixels);
+//		}
 		individual.updateChromosome();
 		return individual;
 	}
@@ -332,8 +339,7 @@ public class Program {
 		this.image = HelpMethods.generateImage(pixels1);
 		setDistances();
 		createMST();
-		
-		
+//		ArrayList<Pixel> mstPixels = HelpMethods.minimumSpanningTree2(pixels);
 		
 //		this.population = HelpMethods.createPopulation(MST, pixels, image, distances);
 //		for (int i = 0; i < Variables.pSize/2; i++) {
@@ -344,54 +350,37 @@ public class Program {
 //			long duration = endTime - startTime;
 //			System.out.println("Duration: " + duration/Math.pow(10, 9) + " sec");
 //		}
-
 		this.population = HelpMethods.createPopulation(MST, pixels, image, distances);
-		for (int i = 0; i < Variables.pSize/2; i++) {
-			long startTime = System.nanoTime();
-			ArrayList<ArrayList<Pixel>> segmentedPixels = paintWithKmeans(10);
-			population.add(encode(segmentedPixels, 30, i*10+20));
-			long endTime = System.nanoTime();
-			long duration = endTime - startTime;
-			System.out.println("Duration: " + duration/Math.pow(10, 9) + " sec");
-		}
+		
+//		for (int i = 0; i < Variables.pSize/2; i++) {
+//			long startTime = System.nanoTime();
+//			ArrayList<ArrayList<Pixel>> segmentedPixels = paintWithKmeans(10);
+//			population.add(encode(segmentedPixels, 30));
+//			long endTime = System.nanoTime();
+//			long duration = endTime - startTime;
+//			System.out.println("Duration: " + duration/Math.pow(10, 9) + " sec");
+//		}
 	}
 	
 	public void run(){
 		long startTime = System.nanoTime();
 		int generations = 1;
-		//do some mutations
-//		for (int i = 0; i < 1000; i++) {
-//			for (Chromosome chromosome : population) {
-//				chromosome.mutate();
-//			}
-//		}
 		for (int i = 0; i < Variables.numberOfGenerations; i++) {
 			population = Nsga2Operations.selection(population);
 //			population = HelpMethods.crossover(selectedPopulation, pixels);
-			for (int j = 0; j < 4; j++) {
-				for (Chromosome chromosome : population) {
-					Nsga2Operations.mutation(chromosome, pixels);
-				}							
-			}
+			Nsga2Operations.mutation(population, pixels);
+			
 			long endTime = System.nanoTime();
 			long duration = endTime - startTime;
 			System.out.println("Generation number: " + generations + ", current best chromosome fitness: " + HelpMethods.findBestChromosome(population).getFitnessValue() + " Duration: " + duration/Math.pow(10,9)+ " sec");
 			generations++;
 		}
-//		HashMap<Integer, ArrayList<Chromosome>> frontierMap = Nsga2Operations.fastNonDominatedSort(population);
-//		ArrayList<Chromosome> frontier1 = frontierMap.get(1);
-//		for(Chromosome chr: frontier1){
-//			Chromosome solution = chr;
-//			int counter = 0;
-//			while(solution.getSegments().size() > 30 && counter < 100){
-//				solution.removeSmallSegments(70);
-//				counter++;
-//			}
-//			solution.updateChromosome();
-//		}
+		Chromosome best = HelpMethods.findBestChromosome(population);
 		
-		HelpMethods.paintEdgesGreen(HelpMethods.findBestChromosome(population));
-		HelpMethods.drawImage(image);
+		long totalEndtime = System.nanoTime();
+		long duration = (long) ((totalEndtime - totalStartTime)/Math.pow(10, 9));
+		HelpMethods.paintEdgesGreen(best);
+		HelpMethods.drawImage(image, best.getSegments(), duration);
 	}
 	
 	public ArrayList<ArrayList<Pixel>> getImage() {
@@ -424,15 +413,37 @@ public class Program {
 	
 	
 	public static void main(String[] args) throws IOException {
-		String imagePath = "Test Image/pi.jpg";
+		String imagePath = "Test Image/1/Test image.jpg";
 		Program p = new Program(imagePath);
 		p.init();
+		p.run();
+//		Chromosome chr1 = HelpMethods.initializeChromosome(80, p.MST, p.pixels, p.image, p.distances);
+//		while (chr1.getSegments().size() > Variables.optimalNumberOfSegments){
+//			Nsga2Operations.mutationMergeTestAllCombinations(chr1, p.pixels);
+//		}
 		
-		ArrayList<Chromosome> pop = p.generateTestImage();
-		Chromosome c = pop.get(1);
-		c.mergeSegments(c.getSegments().get(0), c.getSegments().get(1));
-		HelpMethods.paintEdgesGreen(c);
-		HelpMethods.drawImage(p.getImage());
+//		ArrayList<ArrayList<Pixel>> decoded = p.paintWithKmeans(8);
+//		Chromosome chr = p.encode(decoded, 1);
+//		int counter = 0;
+//		while(chr.getSegments().size() > 400 && counter < 100){
+//			System.out.println("Number of segments: " +chr.getSegments().size());
+//			chr.removeSmallSegments(2000);
+//			counter++;
+//		}
+//		while(chr.getSegments().size() > Variables.optimalNumberOfSegments){
+//			Nsga2Operations.mutationMergeTestAllCombinations(chr, p.pixels);
+//			System.out.println("SHIT" +chr.getSegments().size());
+//		}
+//		HelpMethods.paintEdgesGreen(chr1);
+//		HelpMethods.drawImage(p.image);
+//		p.init();
+//		p.run();
+//		HelpMethods.c
+//		ArrayList<Chromosome> pop = p.generateTestImage();
+//		Chromosome c = pop.get(1);
+//		c.mergeSegments(c.getSegments().get(0), c.getSegments().get(1));
+//		HelpMethods.paintEdgesGreen(chr1);
+//		HelpMethods.drawImage(p.getImage());
 //		p.run();
 
 //		p.getPopulation().get(0).updateSegmentBorder();

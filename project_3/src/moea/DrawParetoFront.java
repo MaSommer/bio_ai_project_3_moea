@@ -82,7 +82,7 @@ public class DrawParetoFront extends JPanel {
 		// and for x axis
 		for (int i = 0; i < scores.size(); i++) {
 			if (scores.size() > 1) {
-				int x0 = i * (getWidth() - padding * 2 - labelPadding) / (numberXDivisions + padding + labelPadding);
+				int x0 = i * (getWidth())  / (numberXDivisions);
 				int x1 = x0;
 				int y0 = getHeight() - padding - labelPadding;
 				int y1 = y0 - pointWidth;
