@@ -106,6 +106,41 @@ public class Chromosome {
 		return this.pixels;
 	}
 	
+	public void mergeSmallSegments(int minSegmentSize) {
+		for(int segmentNr = 0 ; segmentNr < segments.size(); segmentNr++){
+			if(segments.get(segmentNr).size() < minSegmentSize){
+				double[] segmentRGB = segmentAvgRGBValues.get(segmentNr);
+				ArrayList<Pixel> segmentBorder = segmentEdges.get(segmentNr);
+				double minDistance = 10000;
+//				int minSegmentSz = 100000000;
+				int bestSegmentNr = -1;
+				for(Pixel borderPixel : segmentBorder){
+					
+					ArrayList<Pixel> borderPixelNeighbours = borderPixel.getNeighbours();
+					if(borderPixelNeighbours.size() == 0){
+						continue;
+					}
+					
+					for(Pixel neigh:borderPixelNeighbours){
+						
+						int neighSegment = pixelToSegment.get(neigh.getId());
+						if(neighSegment != segmentNr){
+							double dist = Functions.rgbDistance(segmentRGB, segmentAvgRGBValues.get(neighSegment)) + Functions.pixelToPixelDeviation(neigh, borderPixel);
+//							double size = segments.get(neighSegment).size();
+							if(dist < minDistance){
+								minDistance = dist;
+								bestSegmentNr = neighSegment;
+							}
+						}
+					}
+				}
+				ArrayList<Pixel> toMergeWith = segments.get(bestSegmentNr);
+				toMergeWith.addAll(segments.get(segmentNr));
+				segments.get(segmentNr).clear();
+			}
+		}
+	}
+	
 	public void paintGroundTruth(){
 		int[] white = {255,255,255};
 		int[] black = {0,0,0};

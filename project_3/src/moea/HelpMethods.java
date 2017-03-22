@@ -2,7 +2,9 @@ package moea;
 
 import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferByte;
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.io.ObjectInputStream.GetField;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -538,6 +540,26 @@ public class HelpMethods {
 //		ArrayList<Chromosome> 
 		for (Chromosome chromosome : population) {
 			
+		}
+	}
+	
+	public static void main(String[] args) {
+		String path = "python /Users/Sjur/Downloads/plot3D.py  1,2,8,3,5 2,4,3,2,8 1,0,6,8,9 x y z";
+		
+		String[] cmd = {path};
+		
+        String line;
+        Process p;
+        try {
+			p = Runtime.getRuntime().exec(path);
+			BufferedReader input = new BufferedReader(new InputStreamReader(p.getInputStream()));
+			System.out.println(input.readLine());
+			while ((line = input.readLine()) != null) {
+				System.out.println(line);
+			}
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
 	}
 	

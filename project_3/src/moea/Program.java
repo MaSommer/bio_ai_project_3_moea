@@ -377,6 +377,9 @@ public class Program {
 		}
 		Chromosome best = HelpMethods.findBestChromosome(population);
 		
+		ArrayList<Chromosome>  frontier= Nsga2Operations.fastNonDominatedSort(population).get(1);
+		ParetoPlot p = new ParetoPlot(frontier);
+		
 		long totalEndtime = System.nanoTime();
 		long duration = (long) ((totalEndtime - totalStartTime)/Math.pow(10, 9));
 		HelpMethods.paintEdgesGreen(best);
@@ -415,7 +418,7 @@ public class Program {
 	
 	
 	public static void main(String[] args) throws IOException {
-		String imagePath = "Test Image/pi.jpg";
+		String imagePath = "Test Image/3/Test image.jpg";
 		Program p = new Program(imagePath);
 		p.init();
 		p.run();
