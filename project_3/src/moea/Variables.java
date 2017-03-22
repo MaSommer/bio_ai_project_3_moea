@@ -5,7 +5,7 @@ public class Variables {
 	
 	public static int maxSegments = 10;
 	public static int minPixelsInSegment = 10;
-	public static int pSize = 2;
+	public static int pSize = 30;
 	public static int numberOfGenerations = 40;
 	
 	//{active deviation, active edgevalue, active connectivity}
