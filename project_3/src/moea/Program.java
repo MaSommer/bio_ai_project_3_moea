@@ -415,7 +415,7 @@ public class Program {
 	
 	
 	public static void main(String[] args) throws IOException {
-		String imagePath = "Test Image/pi.jpg";
+		String imagePath = "Test Image/3/Test image.jpg";
 		Program p = new Program(imagePath);
 		p.init();
 		p.run();
